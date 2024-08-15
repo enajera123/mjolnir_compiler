@@ -1,7 +1,7 @@
 
 class Token:
-    def __init__(self, type_, value=None) -> None:
-        self.type_ = type_
+    def __init__(self, type, value=None) -> None:
+        self.type = type
         self.value = value
 
     def __repr__(self) -> str:

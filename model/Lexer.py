@@ -1,7 +1,9 @@
-from Position import Position
-from Token import Token
-from IllegalCharError import IllegalCharError
+from .Position import Position
+from .Token import Token
+from .IllegalCharError import IllegalCharError
 from utils.law import LAW
+
+
 class Lexer:
     def __init__(self, fn, text) -> None:
         self.text = text
@@ -64,7 +66,7 @@ class Lexer:
                 return [], IllegalCharError(pos_start, self.pos, "'" + char + "'")
         return tokens, None
 
-    def run(text):
-        lexer = Lexer(text)
+    def run(fn, text):
+        lexer = Lexer(fn, text)
         tokens, error = lexer.make_tokens()
         return tokens, error
