@@ -6,6 +6,6 @@ class LAW:
     SUB = "SUB"
     MUL = "MUL"
     DIV = "DIV"
-    LP = "LP"
-    RP = "RP"
+    LP = "LP" # Left Parenthesis
+    RP = "RP" # Right Parenthesis
     TOKENS = [NUMBER, DECIMAL, SUM, SUB, MUL, DIV, LP, RP]
