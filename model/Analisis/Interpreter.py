@@ -10,17 +10,17 @@ class Interpreter:
         self,
         node: Union[NumberNode, UnaryOperatorNode, BinaryOperatorNode],
     ):
-        method_name = f"visit_{type(node).__name__}"
-        visitor = getattr(self, method_name, self.no_visit_method)
+        method_name = f"{type(node).__name__}"
+        visitor = getattr(self, method_name, self.default)
         return visitor(node)
 
-    def no_visit_method(
+    def default(
         self,
         node: Union[NumberNode, UnaryOperatorNode, BinaryOperatorNode],
     ):
-        raise Exception(f"No visit_{type(node).__name__} method defined")
+        raise Exception(f"No {type(node).__name__} defined")
 
-    def visit_AccessVariableNode(self, node: AccessVariableNode):
+    def AccessVariableNode(self, node: AccessVariableNode):#Must be the same name as the class
         res = RuntimeResult()
         variable_name = node.variable_token.value
         value = LAW.SYMBOL_TABLE.get(variable_name)
@@ -34,7 +34,7 @@ class Interpreter:
             )
         return res.success(value)
 
-    def visit_AssignVariableNode(self, node: AssignVariableNode):
+    def AssignVariableNode(self, node: AssignVariableNode):
         res = RuntimeResult()
         variable_name = node.variable_name.value
         value = res.register(self.visit(node.value_node))
@@ -43,7 +43,7 @@ class Interpreter:
         LAW.SYMBOL_TABLE.set(variable_name, value)
         return res.success(value)
 
-    def visit_NumberNode(
+    def NumberNode(
         self,
         node: NumberNode,
     ):
@@ -53,7 +53,7 @@ class Interpreter:
             )
         )
 
-    def visit_BinaryOperatorNode(
+    def BinaryOperatorNode(
         self,
         node: BinaryOperatorNode,
     ):
@@ -65,13 +65,13 @@ class Interpreter:
         if res.error:
             return res
         if node.operator_token.type == LAW.SUM:
-            result, error = left.added_to(right)
+            result, error = left.sum(right)
         elif node.operator_token.type == LAW.SUB:
-            result, error = left.subbed_by(right)
+            result, error = left.sub(right)
         elif node.operator_token.type == LAW.MUL:
-            result, error = left.multed_by(right)
+            result, error = left.mul(right)
         elif node.operator_token.type == LAW.DIV:
-            result, error = left.dived_by(right)
+            result, error = left.div(right)
         if error:
             return res.failure(error)
         else:
@@ -79,7 +79,7 @@ class Interpreter:
                 result.set_position(node.start_position, node.final_position)
             )
 
-    def visit_UnaryOperatorNode(
+    def UnaryOperatorNode(
         self,
         node: UnaryOperatorNode,
     ):
@@ -89,7 +89,7 @@ class Interpreter:
             return res
         error = None
         if node.operator_token.type == LAW.SUM:
-            number, error = number.multed_by(Number(1))
+            number, error = number.mul(Number(1))
         elif node.operator_token.type == LAW.SUB:
             number, error = number.multed_by(Number(-1))
         if error:

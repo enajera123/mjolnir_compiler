@@ -11,19 +11,19 @@ class Number:
         self.final_position = final_position
         return self
 
-    def added_to(self, other):
+    def sum(self, other):
         if isinstance(other, Number):
             return Number(self.value + other.value), None
 
-    def subbed_by(self, other):
+    def sub(self, other):
         if isinstance(other, Number):
             return Number(self.value - other.value), None
 
-    def multed_by(self, other):
+    def mul(self, other):
         if isinstance(other, Number):
             return Number(self.value * other.value), None
 
-    def dived_by(self, other):
+    def div(self, other):
         if isinstance(other, Number):
             if other.value == 0:
                 return None, RuntimeError(
