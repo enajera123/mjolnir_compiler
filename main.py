@@ -12,10 +12,13 @@ from model.Program import Program
 #     main = main_view()
 #     main.show()
 #     sys.exit(app.exec_())
-while True:
-    text = input("mjolnir > ")
-    result, error = Program.run("<stdin>", text)
+if __name__ == "__main__":
+    text = open("code.mj", "r").read()
+    print(text)
+    results, error = Program.run("<stdin>", text)
     if error:
         print(error)
     else:
-        print(result)
+        for result in results:
+            print(result)
+

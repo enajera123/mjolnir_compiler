@@ -1,0 +1,4 @@
+1+1
+VAR i = 20
+VAR nextNumber = i*i
+i+i+i+i+i

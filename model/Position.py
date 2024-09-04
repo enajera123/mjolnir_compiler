@@ -1,12 +1,12 @@
 class Position:
-    def __init__(self, index, line_number, column_number, fn, text) -> None:
+    def __init__(self, index, line_number, column_number, file_name, text) -> None:
         self.index = index
         self.line_number = line_number
         self.column_number = column_number
-        self.fn = fn
+        self.file_name = file_name
         self.text = text
 
-    def advance(self, current_char=None):
+    def next_position(self, current_char=None):
         self.index += 1
         self.column_number += 1
         if current_char == "\n":
@@ -15,5 +15,5 @@ class Position:
         return self
 
     def copy(self):
-        return Position(self.index, self.line_number, self.column_number, self.fn, self.text)
+        return Position(self.index, self.line_number, self.column_number, self.file_name, self.text)
 

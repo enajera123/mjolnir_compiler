@@ -8,6 +8,7 @@ class LAW:
     NUMBER = "NUMBER"
     DECIMAL = "DECIMAL"
     END_OF_FILE = "END"
+    END_LINE = "END_LINE"
     RW = "RW"
     IDENTIFIER = "IDENTIFIER"
     EQUALS = "EQUALS"
@@ -45,4 +46,5 @@ class LAW:
         IDENTIFIER,
         RW,
         END_OF_FILE,
+        END_LINE
     ]

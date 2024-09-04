@@ -14,7 +14,7 @@ class Token:
         if start_position:
             self.start_position = start_position.copy()
             self.final_position = start_position.copy()
-            self.final_position.advance()
+            self.final_position.next_position()
         if final_position:
             self.final_position = final_position
 

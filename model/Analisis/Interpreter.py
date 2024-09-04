@@ -6,20 +6,30 @@ from model.Number import Number
 
 
 class Interpreter:
-    def visit(
+    def run(
         self,
         node: Union[NumberNode, UnaryOperatorNode, BinaryOperatorNode],
     ):
         method_name = f"{type(node).__name__}"
-        visitor = getattr(self, method_name, self.default)
-        return visitor(node)
+        method = getattr(self, method_name, self.default)
+        return method(node)
 
     def default(
         self,
         node: Union[NumberNode, UnaryOperatorNode, BinaryOperatorNode],
     ):
         raise Exception(f"No {type(node).__name__} defined")
-
+    def ListNode(self, node: ListNode):
+        res = RuntimeResult()
+        elements = []
+        for element in node.elements:
+            value = res.register(self.run(element))
+            if res.error:
+                return res
+            elements.append(value)
+        return res.success(
+            elements
+        )
     def AccessVariableNode(self, node: AccessVariableNode):#Must be the same name as the class
         res = RuntimeResult()
         variable_name = node.variable_token.value
@@ -37,7 +47,7 @@ class Interpreter:
     def AssignVariableNode(self, node: AssignVariableNode):
         res = RuntimeResult()
         variable_name = node.variable_name.value
-        value = res.register(self.visit(node.value_node))
+        value = res.register(self.run(node.value_node))
         if res.error:
             return res
         LAW.SYMBOL_TABLE.set(variable_name, value)
@@ -58,10 +68,10 @@ class Interpreter:
         node: BinaryOperatorNode,
     ):
         res = RuntimeResult()
-        left = res.register(self.visit(node.left_node))
+        left = res.register(self.run(node.left_node))
         if res.error:
             return res
-        right = res.register(self.visit(node.right_node))
+        right = res.register(self.run(node.right_node))
         if res.error:
             return res
         if node.operator_token.type == LAW.SUM:
@@ -84,7 +94,7 @@ class Interpreter:
         node: UnaryOperatorNode,
     ):
         res = RuntimeResult()
-        number = res.register(self.visit(node.node))
+        number = res.register(self.run(node.node))
         if res.error:
             return res
         error = None

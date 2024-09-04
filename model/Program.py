@@ -10,9 +10,9 @@ class Program:
         if error:
             return None, error
         parser = Parser(tokens)
-        tree = parser.parse()
+        tree = parser.run()
         if tree.error:
             return None, tree.error
         interpreter = Interpreter()
-        result = interpreter.visit(tree.node)
+        result = interpreter.run(tree.node)
         return result.value, result.error
