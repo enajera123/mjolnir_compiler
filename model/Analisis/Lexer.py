@@ -1,6 +1,6 @@
-from .Position import Position
-from .Token import Token
-from .IllegalCharError import IllegalCharError
+from model.Position import Position
+from model.Token import Token
+from model.Error.IllegalCharError import IllegalCharError
 from utils.law import LAW
 
 
@@ -17,6 +17,15 @@ class Lexer:
         self.current_char = (
             self.text[self.pos.index] if self.pos.index < len(self.text) else None
         )
+
+    def make_reserved_word(self):
+        id_str = ""
+        pos_start = self.pos.copy()
+        while self.current_char != None and self.current_char in LAW.LETTERS:
+            id_str += self.current_char
+            self.advance()
+        token_type = LAW.RW if id_str in LAW.RESERVED_WORDS else LAW.IDENTIFIER
+        return Token(token_type, id_str, pos_start, self.pos)
 
     def make_number(self):
         number = ""
@@ -49,8 +58,10 @@ class Lexer:
     def make_tokens(self):
         tokens = []
         while self.current_char != None:
-            if self.current_char in ["\t",' ']:
+            if self.current_char in ["\t", " "]:
                 self.advance()
+            elif self.current_char in LAW.LETTERS:
+                tokens.append(self.make_reserved_word())
             elif self.current_char in LAW.DIGITS:
                 tokens.append(self.make_number())
             elif self.current_char == "+":
@@ -61,6 +72,9 @@ class Lexer:
                 self.advance()
             elif self.current_char == "*":
                 tokens.append(Token(LAW.MUL, start_position=self.pos))
+                self.advance()
+            elif self.current_char == "=":
+                tokens.append(Token(LAW.EQUALS, start_position=self.pos))
                 self.advance()
             elif self.current_char == "/":
                 tokens.append(Token(LAW.DIV, start_position=self.pos))

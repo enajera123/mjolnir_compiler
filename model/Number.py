@@ -1,32 +1,27 @@
-from model.RuntimeError import RuntimeError
+from model.Error.RuntimeError import RuntimeError
 
 
 class Number:
     def __init__(self, value):
         self.value = value
         self.set_position()
-        self.set_context()
 
     def set_position(self, start_position=None, final_position=None):
         self.start_position = start_position
         self.final_position = final_position
         return self
 
-    def set_context(self, context=None):
-        self.context = context
-        return self
-
     def added_to(self, other):
         if isinstance(other, Number):
-            return Number(self.value + other.value).set_context(self.context), None
+            return Number(self.value + other.value), None
 
     def subbed_by(self, other):
         if isinstance(other, Number):
-            return Number(self.value - other.value).set_context(self.context), None
+            return Number(self.value - other.value), None
 
     def multed_by(self, other):
         if isinstance(other, Number):
-            return Number(self.value * other.value).set_context(self.context), None
+            return Number(self.value * other.value), None
 
     def dived_by(self, other):
         if isinstance(other, Number):
@@ -35,9 +30,8 @@ class Number:
                     other.start_position,
                     other.final_position,
                     "Division by zero",
-                    self.context,
                 )
-            return Number(self.value / other.value).set_context(self.context), None
+            return Number(self.value / other.value), None
 
     def __repr__(self):
         return str(self.value)

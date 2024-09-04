@@ -1,6 +1,13 @@
+from model.Position import Position
+
+
 class Token:
     def __init__(
-        self, type, value=None, start_position=None, final_position=None
+        self,
+        type: str,
+        value=None,
+        start_position: Position = None,
+        final_position: Position = None,
     ) -> None:
         self.type = type
         self.value = value
@@ -15,3 +22,7 @@ class Token:
         if self.value:
             return f"{self.type}:{self.value}"
         return f"{self.type}"
+    def equals(self, type,value):
+        if self.type == type and self.value == value:
+            return True
+        return False

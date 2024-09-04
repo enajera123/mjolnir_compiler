@@ -1,9 +1,10 @@
 from utils.law import LAW
-from model.NumberNode import NumberNode
-from model.BinaryOperatorNode import BinaryOperatorNode
-from model.InvalidSyntaxError import InvalidSyntaxError
-from model.UnaryOperatorNode import UnaryOperatorNode
-
+from model.Error.InvalidSyntaxError import InvalidSyntaxError
+from model.Node.BinaryOperatorNode import BinaryOperatorNode
+from model.Node.AccessVariableNode import AccessVariableNode
+from model.Node.NumberNode import NumberNode
+from model.Node.AssignVariableNode import AssignVariableNode
+from model.Node.UnaryOperatorNode import UnaryOperatorNode
 
 class Parser:
     def __init__(self, tokens):
@@ -11,7 +12,9 @@ class Parser:
         self.token_index = -1
         self.advance()
 
-    def advance(self, ):
+    def advance(
+        self,
+    ):
         self.token_index += 1
         if self.token_index < len(self.tokens):
             self.current_token = self.tokens[self.token_index]
@@ -26,6 +29,9 @@ class Parser:
             if result.error:
                 return result
             return result.success(UnaryOperatorNode(token, factor))
+        elif token.type == LAW.IDENTIFIER:
+            result.register(self.advance())
+            return result.success(AccessVariableNode(token))
         elif token.type in (LAW.NUMBER, LAW.DECIMAL):
             result.register(self.advance())
             return result.success(NumberNode(token))
@@ -42,16 +48,14 @@ class Parser:
                     InvalidSyntaxError(
                         self.current_token.start_position,
                         self.current_token.final_position,
-                        "Expected ')'",
-                        "Got " + self.current_token.type,
+                        f"Expected ')' Got {self.current_token.type}",
                     )
                 )
         return result.failure(
             InvalidSyntaxError(
                 token.start_position,
                 token.final_position,
-                "Expected int or float",
-                "Got " + token.type,
+                f"Expected int or float, Got {token.type}",
             )
         )
 
@@ -73,7 +77,34 @@ class Parser:
         return result.success(left)
 
     def expression(self):
+        res = ParseResult()
+        if self.current_token.equals(LAW.RW,"VAR"):
+            res.register(self.advance())
+            if self.current_token.type != LAW.IDENTIFIER:
+                return res.failure(
+                    InvalidSyntaxError(
+                        self.current_token.start_position,
+                        self.current_token.final_position,
+                        f"Expected identifier Got {self.current_token.type}",
+                    )
+                )
+            var_name = self.current_token
+            res.register(self.advance())
+            if self.current_token.type != LAW.EQUALS:
+                return res.failure(
+                    InvalidSyntaxError(
+                        self.current_token.start_position,
+                        self.current_token.final_position,
+                        f"Expected '=' Got {self.current_token.type}",
+                    )
+                )
+            res.register(self.advance())
+            value = res.register(self.expression())
+            if res.error:
+                return res
+            return res.success(AssignVariableNode(var_name, value))
         return self.binary_operation(self.term, (LAW.SUM, LAW.SUB))
+        
 
     def parse(self):
         res = self.expression()
@@ -82,8 +113,7 @@ class Parser:
                 InvalidSyntaxError(
                     self.current_token.start_position,
                     self.current_token.final_position,
-                    "Expected '+', '-', '*', or '/'",
-                    "Got " + self.current_token.type,
+                    f"Expected '+', '-', '*', or '/' Got {self.current_token.type}",
                 )
             )
         return res

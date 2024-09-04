@@ -1,7 +1,6 @@
-from model.Lexer import Lexer
-from model.Parser import Parser
-from model.Interpreter import Interpreter
-from model.Context import Context
+from model.Analisis.Lexer import Lexer
+from model.Analisis.Parser import Parser
+from model.Analisis.Interpreter import Interpreter
 
 class Program:
     @staticmethod
@@ -15,6 +14,5 @@ class Program:
         if tree.error:
             return None, tree.error
         interpreter = Interpreter()
-        context = Context("<mjolnir>")
-        result = interpreter.visit(tree.node, context)
+        result = interpreter.visit(tree.node)
         return result.value, result.error
