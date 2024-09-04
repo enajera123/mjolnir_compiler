@@ -1,0 +1,3 @@
+expression  : term ((SUM|SUB) term)*
+term        : factor ((MUL|DIV) factor)*
+factor      : INT|FLOAT

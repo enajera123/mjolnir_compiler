@@ -1,19 +1,19 @@
 class Position:
-    def __init__(self, idx, ln, col, fn, ftxt) -> None:
-        self.idx = idx
-        self.ln = ln
-        self.col = col
+    def __init__(self, index, line_number, column_number, fn, text) -> None:
+        self.index = index
+        self.line_number = line_number
+        self.column_number = column_number
         self.fn = fn
-        self.ftxt = ftxt
+        self.text = text
 
-    def advance(self, current_char):
-        self.idx += 1
-        self.col += 1
+    def advance(self, current_char=None):
+        self.index += 1
+        self.column_number += 1
         if current_char == "\n":
-            self.ln += 1
-            self.col = 0
+            self.line_number += 1
+            self.column_number = 0
         return self
 
     def copy(self):
-        return Position(self.idx, self.ln, self.col, self.fn, self.ftxt)
+        return Position(self.index, self.line_number, self.column_number, self.fn, self.text)
 

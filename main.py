@@ -1,4 +1,4 @@
-from model.Lexer import Lexer
+from model.Program import Program
 
 # import sys
 # from PyQt5.QtWidgets import QApplication
@@ -14,7 +14,7 @@ from model.Lexer import Lexer
 #     sys.exit(app.exec_())
 while True:
     text = input("mjolnir > ")
-    result, error = Lexer.run("<stdin>", text)
+    result, error = Program.run("<stdin>", text)
     if error:
         print(error)
     else:

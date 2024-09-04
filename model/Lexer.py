@@ -7,6 +7,7 @@ from utils.law import LAW
 class Lexer:
     def __init__(self, fn, text) -> None:
         self.text = text
+        self.fn = fn
         self.pos = Position(-1, 0, -1, fn, text)
         self.current_char = None
         self.advance()
@@ -14,59 +15,66 @@ class Lexer:
     def advance(self):
         self.pos.advance(self.current_char)
         self.current_char = (
-            self.text[self.pos.idx] if self.pos.idx < len(self.text) else None
+            self.text[self.pos.index] if self.pos.index < len(self.text) else None
         )
 
     def make_number(self):
-        num_str = ""
-        dot_count = 0
+        number = ""
+        has_dot = False
+        start_position = self.pos.copy()
         while self.current_char != None and self.current_char in LAW.DIGITS + ".":
             if self.current_char == ".":
-                if dot_count == 1:
+                if has_dot:
                     break
-                dot_count += 1
-                num_str += "."
+                has_dot = True
+                number += "."
             else:
-                num_str += self.current_char
+                number += self.current_char
             self.advance()
-        if dot_count == 0:
-            return Token(LAW.NUMBER, int(num_str))
+        if not has_dot:
+            return Token(
+                LAW.NUMBER,
+                int(number),
+                start_position=start_position,
+                final_position=self.pos,
+            )
         else:
-            return Token(LAW.DECIMAL, float(num_str))
+            return Token(
+                LAW.DECIMAL,
+                float(number),
+                start_position=start_position,
+                final_position=self.pos,
+            )
 
     def make_tokens(self):
         tokens = []
         while self.current_char != None:
-            if self.current_char in "\t":
+            if self.current_char in ["\t",' ']:
                 self.advance()
             elif self.current_char in LAW.DIGITS:
                 tokens.append(self.make_number())
             elif self.current_char == "+":
-                tokens.append(Token(LAW.SUM))
+                tokens.append(Token(LAW.SUM, start_position=self.pos))
                 self.advance()
             elif self.current_char == "-":
-                tokens.append(Token(LAW.SUB))
+                tokens.append(Token(LAW.SUB, start_position=self.pos))
                 self.advance()
             elif self.current_char == "*":
-                tokens.append(Token(LAW.MUL))
+                tokens.append(Token(LAW.MUL, start_position=self.pos))
                 self.advance()
             elif self.current_char == "/":
-                tokens.append(Token(LAW.DIV))
+                tokens.append(Token(LAW.DIV, start_position=self.pos))
                 self.advance()
             elif self.current_char == "(":
-                tokens.append(Token(LAW.LP))
+                tokens.append(Token(LAW.LP, start_position=self.pos))
                 self.advance()
             elif self.current_char == ")":
-                tokens.append(Token(LAW.RP))
+                tokens.append(Token(LAW.RP, start_position=self.pos))
                 self.advance()
             else:
                 pos_start = self.pos.copy()
                 char = self.current_char
                 self.advance()
                 return [], IllegalCharError(pos_start, self.pos, "'" + char + "'")
+        tokens.append(Token(LAW.END_OF_FILE, start_position=self.pos))
         return tokens, None
-
-    def run(fn, text):
-        lexer = Lexer(fn, text)
-        tokens, error = lexer.make_tokens()
-        return tokens, error
