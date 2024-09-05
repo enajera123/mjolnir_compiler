@@ -1,4 +1,11 @@
 from typing import Union
+
+from model.Node.AccessVariableNode import AccessVariableNode
+from model.Node.AssignVariableNode import AssignVariableNode
+from model.Node.BinaryOperatorNode import BinaryOperatorNode
+from model.Node.ListNode import ListNode
+from model.Node.NumberNode import NumberNode
+from model.Node.UnaryOperatorNode import UnaryOperatorNode
 from model.RuntimeResult import RuntimeResult
 from model.Node import *
 from utils.law import LAW
