@@ -4,6 +4,8 @@ from model.Node.AccessVariableNode import AccessVariableNode
 from model.Node.AssignVariableNode import AssignVariableNode
 from model.Node.BinaryOperatorNode import BinaryOperatorNode
 from model.Node.ListNode import ListNode
+from model.Node.StringNode import StringNode
+from model.String import String
 from model.Node.NumberNode import NumberNode
 from model.Node.UnaryOperatorNode import UnaryOperatorNode
 from model.RuntimeResult import RuntimeResult
@@ -61,6 +63,13 @@ class Interpreter:
             return res
         LAW.SYMBOL_TABLE.set(variable_name, value)
         return res.success(value)
+
+    def StringNode(self, node: StringNode):
+        return RuntimeResult().success(
+            String(node.token.value).set_position(
+                node.start_position, node.final_position
+            )
+        )
 
     def NumberNode(
         self,

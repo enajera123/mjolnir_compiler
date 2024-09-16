@@ -1,3 +1,4 @@
 VAR a = 1*2
 VAR b = 3
-a>=b
+VAR c = "Hola soy esteban"
+VAR d = TRUE

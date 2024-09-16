@@ -7,6 +7,7 @@ class LAW:
     LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
     NUMBER = "NUMBER"
     DECIMAL = "DECIMAL"
+    STRING = "STRING"
     END_OF_FILE = "END"
     END_LINE = "END_LINE"
     RW = "RW"
@@ -39,25 +40,4 @@ class LAW:
         "RETURN",
         "CONTINUE",
         "BREAK",
-    ]
-    TOKENS = [
-        NUMBER,
-        DECIMAL,
-        SUM,
-        SUB,
-        MUL,
-        DIV,
-        LP,
-        RP,
-        EQUALS,
-        IDENTIFIER,
-        RW,
-        END_OF_FILE,
-        END_LINE,
-        NEQ,
-        GTE,
-        GT,
-        EQ,
-        LT,
-        LTE,
     ]

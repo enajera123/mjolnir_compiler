@@ -96,6 +96,16 @@ class Lexer:
             type = LAW.LTE
         return Token(type, start_position=start_position, final_position=self.position)
 
+    def make_string(self):
+        string = ""
+        start_position = self.position.copy()
+        self.next_character()
+        while self.current_char != None and self.current_char != '"':
+            string += self.current_char
+            self.next_character()
+        self.next_character()
+        return Token(LAW.STRING, string, start_position, self.position)
+
     def make_tokens(self):
         tokens = []
         while self.current_char != None:
@@ -119,8 +129,6 @@ class Lexer:
                 self.next_character()
             elif self.current_char == "=":
                 tokens.append(self.make_equals())
-                # tokens.append(Token(LAW.EQUALS, start_position=self.position))
-                # self.next_character()
             elif self.current_char == "!":
                 token, error = self.make_not_equals()
                 if error:
@@ -130,6 +138,8 @@ class Lexer:
                 tokens.append(self.make_greater_than())
             elif self.current_char == "<":
                 tokens.append(self.make_less_than())
+            elif self.current_char == '"':
+                tokens.append(self.make_string())
             elif self.current_char == "/":
                 tokens.append(Token(LAW.DIV, start_position=self.position))
                 self.next_character()
@@ -145,4 +155,5 @@ class Lexer:
                 self.next_character()
                 return [], IllegalCharError(pos_start, self.position, "'" + char + "'")
         tokens.append(Token(LAW.END_OF_FILE, start_position=self.position))
+        print(tokens)
         return tokens, None

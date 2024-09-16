@@ -4,6 +4,7 @@ from model.Node.BinaryOperatorNode import BinaryOperatorNode
 from model.Node.ListNode import ListNode
 from model.Node.AccessVariableNode import AccessVariableNode
 from model.Node.NumberNode import NumberNode
+from model.Node.StringNode import StringNode
 from model.Node.AssignVariableNode import AssignVariableNode
 from model.Node.UnaryOperatorNode import UnaryOperatorNode
 
@@ -34,6 +35,9 @@ class Parser:
         elif token.type == LAW.IDENTIFIER:
             result.register(self.advance())
             return result.success(AccessVariableNode(token))
+        elif token.type == LAW.STRING:
+            result.register(self.advance())
+            return result.success(StringNode(token))
         elif token.type in (LAW.NUMBER, LAW.DECIMAL):
             result.register(self.advance())
             return result.success(NumberNode(token))
@@ -77,26 +81,34 @@ class Parser:
                 return result
             left = BinaryOperatorNode(left, operator_token, right)
         return result.success(left)
-    
+
     def compare_expression(self):
         res = RunResult()
         if self.current_token.equals(LAW.KEY, "NOT"):
             operator_token = self.current_token
             self.advance()
             node = res.register(self.compare_expression())
-            if res.error:return res
+            if res.error:
+                return res
             return res.success(UnaryOperatorNode(operator_token, node))
-        node = res.register(self.binary_operation(self.arith_expr, (LAW.EQ, LAW.NEQ, LAW.LT, LAW.GT, LAW.LTE, LAW.GTE)))
-        
+        node = res.register(
+            self.binary_operation(
+                self.comparison_expresion, (LAW.EQ, LAW.NEQ, LAW.LT, LAW.GT, LAW.LTE, LAW.GTE)
+            )
+        )
+
         if res.error:
-            return res.failure(InvalidSyntaxError(
-                self.current_token.start_position, self.current_token.final_position,
-                "Expected int, float, identifier, '+', '-', '(' or 'NOT'"
-            ))
+            return res.failure(
+                InvalidSyntaxError(
+                    self.current_token.start_position,
+                    self.current_token.final_position,
+                    "Expected int, float, identifier, '+', '-', '(' or 'NOT'",
+                )
+            )
         return res.success(node)
-        
-    def arith_expr(self):
-	    return self.binary_operation(self.term, (LAW.SUM, LAW.SUB))
+
+    def comparison_expresion(self):
+        return self.binary_operation(self.term, (LAW.SUM, LAW.SUB))
 
     def expression(self):
         res = RunResult()
@@ -138,12 +150,12 @@ class Parser:
                     "Expected 'VAR', int, float, identifier, '+', '-', '(' or 'NOT'",
                 )
             )
-        # return self.binary_operation(self.term, (LAW.SUM, LAW.SUB))
         return res.success(node)
 
     def lines(self):
         res = RunResult()
         lines = []
+        print(self.tokens)
         start_position = self.current_token.start_position
         while self.current_token.type == LAW.END_LINE:
             res.register(self.advance())
@@ -189,10 +201,6 @@ class Parser:
                 )
             )
         return res.success(expression)
-        # expression = res.register(self.expression())
-        # if res.error:
-        #     return res
-        # return res.success(expression
 
     def run(self):
         res = self.lines()
