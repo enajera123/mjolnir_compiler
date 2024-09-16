@@ -10,12 +10,19 @@ class LAW:
     END_OF_FILE = "END"
     END_LINE = "END_LINE"
     RW = "RW"
+    KEY = "KEY"
     IDENTIFIER = "IDENTIFIER"
     EQUALS = "EQUALS"
     SUM = "SUM"
     SUB = "SUB"
     MUL = "MUL"
     DIV = "DIV"
+    EQ = "EQ"
+    NEQ = "NEQ"
+    LT = "LT"
+    GT = "GT"
+    LTE = "LTE"
+    GTE = "GTE"
     LP = "LP"  # Left Parenthesis
     RP = "RP"  # Right Parenthesis
     RESERVED_WORDS = [
@@ -46,5 +53,11 @@ class LAW:
         IDENTIFIER,
         RW,
         END_OF_FILE,
-        END_LINE
+        END_LINE,
+        NEQ,
+        GTE,
+        GT,
+        EQ,
+        LT,
+        LTE,
     ]

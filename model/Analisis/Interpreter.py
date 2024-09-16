@@ -26,6 +26,7 @@ class Interpreter:
         node: Union[NumberNode, UnaryOperatorNode, BinaryOperatorNode],
     ):
         raise Exception(f"No {type(node).__name__} defined")
+
     def ListNode(self, node: ListNode):
         res = RuntimeResult()
         elements = []
@@ -34,10 +35,11 @@ class Interpreter:
             if res.error:
                 return res
             elements.append(value)
-        return res.success(
-            elements
-        )
-    def AccessVariableNode(self, node: AccessVariableNode):#Must be the same name as the class
+        return res.success(elements)
+
+    def AccessVariableNode(
+        self, node: AccessVariableNode
+    ):  # Must be the same name as the class
         res = RuntimeResult()
         variable_name = node.variable_token.value
         value = LAW.SYMBOL_TABLE.get(variable_name)
@@ -89,6 +91,22 @@ class Interpreter:
             result, error = left.mul(right)
         elif node.operator_token.type == LAW.DIV:
             result, error = left.div(right)
+        elif node.operator_token.type == LAW.EQ:
+            result, error = left.equals(right)
+        elif node.operator_token.type == LAW.NEQ:
+            result, error = left.not_equals(right)
+        elif node.operator_token.type == LAW.GT:
+            result, error = left.greater_than(right)
+        elif node.operator_token.type == LAW.GTE:
+            result, error = left.greater_than_equals(right)
+        elif node.operator_token.type == LAW.LT:
+            result, error = left.less_than(right)
+        elif node.operator_token.type == LAW.LTE:
+            result, error = left.less_than_equals(right)
+        elif node.operator_token.equals(LAW.KEY, "AND"):
+            result, error = left.and_expression(right)
+        elif node.operator_token.equals(LAW.KEY, "OR"):
+            result, error = left.or_expression(right)
         if error:
             return res.failure(error)
         else:
@@ -109,6 +127,8 @@ class Interpreter:
             number, error = number.mul(Number(1))
         elif node.operator_token.type == LAW.SUB:
             number, error = number.multed_by(Number(-1))
+        elif node.operator_token.equals(LAW.KEY, "NOT"):
+            number, error = number.not_expression()
         if error:
             return res.failure(error)
         else:

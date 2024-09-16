@@ -57,6 +57,45 @@ class Lexer:
                 final_position=self.position,
             )
 
+    def make_equals(self):
+        type = LAW.EQUALS
+        start_position = self.position.copy()
+        self.next_character()
+        if self.current_char == "=":
+            self.next_character()
+            type = LAW.EQ
+        return Token(type, start_position=start_position, final_position=self.position)
+
+    def make_not_equals(self):
+        start_position = self.position.copy()
+        self.next_character()
+        if self.current_char == "=":
+            self.next_character()
+            return Token(
+                LAW.NEQ, start_position=start_position, final_position=self.position
+            )
+        return None, IllegalCharError(
+            start_position, self.position, "'" + self.current_char + "'"
+        )
+
+    def make_greater_than(self):
+        type = LAW.GT
+        start_position = self.position.copy()
+        self.next_character()
+        if self.current_char == "=":
+            self.next_character()
+            type = LAW.GTE
+        return Token(type, start_position=start_position, final_position=self.position)
+
+    def make_less_than(self):
+        type = LAW.LT
+        start_position = self.position.copy()
+        self.next_character()
+        if self.current_char == "=":
+            self.next_character()
+            type = LAW.LTE
+        return Token(type, start_position=start_position, final_position=self.position)
+
     def make_tokens(self):
         tokens = []
         while self.current_char != None:
@@ -79,8 +118,18 @@ class Lexer:
                 tokens.append(Token(LAW.MUL, start_position=self.position))
                 self.next_character()
             elif self.current_char == "=":
-                tokens.append(Token(LAW.EQUALS, start_position=self.position))
-                self.next_character()
+                tokens.append(self.make_equals())
+                # tokens.append(Token(LAW.EQUALS, start_position=self.position))
+                # self.next_character()
+            elif self.current_char == "!":
+                token, error = self.make_not_equals()
+                if error:
+                    return [], error
+                tokens.append(token)
+            elif self.current_char == ">":
+                tokens.append(self.make_greater_than())
+            elif self.current_char == "<":
+                tokens.append(self.make_less_than())
             elif self.current_char == "/":
                 tokens.append(Token(LAW.DIV, start_position=self.position))
                 self.next_character()

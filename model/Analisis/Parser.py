@@ -77,6 +77,26 @@ class Parser:
                 return result
             left = BinaryOperatorNode(left, operator_token, right)
         return result.success(left)
+    
+    def compare_expression(self):
+        res = RunResult()
+        if self.current_token.equals(LAW.KEY, "NOT"):
+            operator_token = self.current_token
+            self.advance()
+            node = res.register(self.compare_expression())
+            if res.error:return res
+            return res.success(UnaryOperatorNode(operator_token, node))
+        node = res.register(self.binary_operation(self.arith_expr, (LAW.EQ, LAW.NEQ, LAW.LT, LAW.GT, LAW.LTE, LAW.GTE)))
+        
+        if res.error:
+            return res.failure(InvalidSyntaxError(
+                self.current_token.start_position, self.current_token.final_position,
+                "Expected int, float, identifier, '+', '-', '(' or 'NOT'"
+            ))
+        return res.success(node)
+        
+    def arith_expr(self):
+	    return self.binary_operation(self.term, (LAW.SUM, LAW.SUB))
 
     def expression(self):
         res = RunResult()
@@ -105,7 +125,21 @@ class Parser:
             if res.error:
                 return res
             return res.success(AssignVariableNode(var_name, value))
-        return self.binary_operation(self.term, (LAW.SUM, LAW.SUB))
+        node = res.register(
+            self.binary_operation(
+                self.compare_expression, ((LAW.KEY, "AND"), (LAW.KEY, "OR"))
+            )
+        )
+        if res.error:
+            return res.failure(
+                InvalidSyntaxError(
+                    self.current_token.start_position,
+                    self.current_token.final_position,
+                    "Expected 'VAR', int, float, identifier, '+', '-', '(' or 'NOT'",
+                )
+            )
+        # return self.binary_operation(self.term, (LAW.SUM, LAW.SUB))
+        return res.success(node)
 
     def lines(self):
         res = RunResult()
