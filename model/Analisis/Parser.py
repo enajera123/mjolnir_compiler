@@ -1,5 +1,6 @@
 from model.Node.ForNode import ForNode
 from model.Node.PrintNode import PrintNode
+from model.Node.WhileNode import WhileNode
 from utils.law import LAW
 from model.Error.InvalidSyntaxError import InvalidSyntaxError
 from model.Node.BinaryOperatorNode import BinaryOperatorNode
@@ -159,31 +160,24 @@ class Parser:
         lines = []
         start_position = self.current_token.start_position
 
-        # Saltar líneas vacías o innecesarias al principio del bloque
         while self.current_token.type == LAW.END_LINE:
             res.register(self.advance())
 
-        # Procesar la primera línea del bloque
         line = res.register(self.line())
         if res.error:
             return res
         lines.append(line)
 
-        # Continuar procesando las siguientes líneas hasta encontrar 'END_OF_FILE' o '}'
         while self.current_token.type == LAW.END_LINE or self.current_token.type != LAW.RCB:
-            # Saltar cualquier nueva línea o ';'
             while self.current_token.type == LAW.END_LINE:
                 res.register(self.advance())
 
-            # Si encontramos '}', terminamos de procesar el bloque
             if self.current_token.type == LAW.RCB:
                 break
 
-            # Si encontramos 'END_OF_FILE' (o 'END'), terminamos el archivo
             if self.current_token.type == LAW.END_OF_FILE:
                 return res.success(ListNode(lines, start_position, self.current_token.final_position))
 
-            # Procesar la siguiente línea
             line = res.register(self.line())
             if res.error:
                 return res
@@ -195,13 +189,13 @@ class Parser:
         res = RunResult()
         initial_position = self.current_token.start_position
 
-        # Manejar las palabras reservadas primero
         if self.current_token.equals(LAW.RW, "FOR"):
             return res.register(self.for_expression())
         elif self.current_token.equals(LAW.RW, "PRINT"):
             return res.register(self.print_statement())
+        elif self.current_token.equals(LAW.RW, "WHILE"):
+            return res.register(self.while_expression())
 
-        # Si no es una palabra reservada, procesar como una expresión
         expression = res.register(self.expression())
         if res.error:
             return res.failure(
@@ -228,14 +222,13 @@ class Parser:
     def for_expression(self):
         res = RunResult()
 
-        # Asegurarse de que el token actual es 'FOR'
         if not self.current_token.equals(LAW.RW, "FOR"):
             return res.failure(
                 InvalidSyntaxError(self.current_token.start_position, self.current_token.final_position,
                                    "Expected 'FOR'")
             )
 
-        res.register(self.advance())  # Avanzar después de 'FOR'
+        res.register(self.advance())
 
         # Leer variable de control
         if self.current_token.type != LAW.IDENTIFIER:
@@ -246,19 +239,16 @@ class Parser:
         var_name = self.current_token
         res.register(self.advance())
 
-        # Asegurarse de que el próximo token sea un '='
         if self.current_token.type != LAW.EQUALS:
             return res.failure(
                 InvalidSyntaxError(self.current_token.start_position, self.current_token.final_position, "Expected '='")
             )
         res.register(self.advance())
 
-        # Valor inicial de la variable de control
         start_value = res.register(self.expression())
         if res.error:
             return res
 
-        # Asegurarse de que el próximo token sea 'TO'
         if not self.current_token.equals(LAW.RW, "TO"):
             return res.failure(
                 InvalidSyntaxError(self.current_token.start_position, self.current_token.final_position,
@@ -266,12 +256,10 @@ class Parser:
             )
         res.register(self.advance())
 
-        # Valor final
         end_value = res.register(self.expression())
         if res.error:
             return res
 
-        # Leer el 'STEP' si existe
         step_value = None
         if self.current_token.equals(LAW.RW, "STEP"):
             res.register(self.advance())
@@ -279,24 +267,21 @@ class Parser:
             if res.error:
                 return res
 
-        # Asegúrate de que se abre el bloque con '{'
         if self.current_token.type != LAW.LCB:
             return res.failure(
                 InvalidSyntaxError(self.current_token.start_position, self.current_token.final_position, "Expected '{'")
             )
         res.register(self.advance())
 
-        # Leer el cuerpo del ciclo
         body = res.register(self.lines())
         if res.error:
             return res
 
-        # Asegúrate de que se cierra el bloque con '}'
         if self.current_token.type != LAW.RCB:
             return res.failure(
                 InvalidSyntaxError(self.current_token.start_position, self.current_token.final_position, "Expected '}'")
             )
-        res.register(self.advance())  # Avanzar después de encontrar '}'
+        res.register(self.advance())
 
         return res.success(
             ForNode(var_name, start_value, end_value, step_value, body, var_name.start_position, body.final_position))
@@ -310,13 +295,64 @@ class Parser:
                                    "Expected 'PRINT'")
             )
 
-        res.register(self.advance())  # Avanzar después de 'PRINT'
+        res.register(self.advance())
 
         value = res.register(self.expression())
         if res.error:
             return res
 
-        return res.success(PrintNode(value))  # Retorna un nodo PrintNode
+        return res.success(PrintNode(value))
+
+    def while_expression(self):
+        res = RunResult()
+
+        if not self.current_token.equals(LAW.RW, "WHILE"):
+            return res.failure(
+                InvalidSyntaxError(self.current_token.start_position, self.current_token.final_position,
+                                   "Expected 'WHILE'")
+            )
+
+        res.register(self.advance())
+
+        if self.current_token.type != LAW.LP:
+            return res.failure(
+                InvalidSyntaxError(self.current_token.start_position, self.current_token.final_position,
+                                   "Expected '(' after 'WHILE'")
+            )
+        res.register(self.advance())
+
+        condition = res.register(self.expression())
+        if res.error:
+            return res
+
+        if self.current_token.type != LAW.RP:
+            return res.failure(
+                InvalidSyntaxError(self.current_token.start_position, self.current_token.final_position,
+                                   "Expected ')' after condition")
+            )
+        res.register(self.advance())
+
+        if self.current_token.type != LAW.LCB:
+            return res.failure(
+                InvalidSyntaxError(self.current_token.start_position, self.current_token.final_position,
+                                   "Expected '{' after condition")
+            )
+        res.register(self.advance())
+
+        body = res.register(self.lines())
+        if res.error:
+            return res
+
+        if self.current_token.type != LAW.RCB:
+            return res.failure(
+                InvalidSyntaxError(self.current_token.start_position, self.current_token.final_position,
+                                   "Expected '}' after body")
+            )
+        res.register(self.advance())
+
+        return res.success(WhileNode(condition, body, condition.start_position, body.final_position))
+
+
 class RunResult:
     def __init__(self):
         self.error = None

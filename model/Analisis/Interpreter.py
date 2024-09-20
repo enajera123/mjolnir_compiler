@@ -7,6 +7,7 @@ from model.Node.ForNode import ForNode
 from model.Node.ListNode import ListNode
 from model.Node.PrintNode import PrintNode
 from model.Node.StringNode import StringNode
+from model.Node.WhileNode import WhileNode
 from model.String import String
 from model.Node.NumberNode import NumberNode
 from model.Node.UnaryOperatorNode import UnaryOperatorNode
@@ -43,7 +44,7 @@ class Interpreter:
 
     def AccessVariableNode(
         self, node: AccessVariableNode
-    ):  # Must be the same name as the class
+    ):
         res = RuntimeResult()
         variable_name = node.variable_token.value
         value = LAW.SYMBOL_TABLE.get(variable_name)
@@ -83,17 +84,17 @@ class Interpreter:
             )
         )
 
-    def BinaryOperatorNode(
-        self,
-        node: BinaryOperatorNode,
-    ):
+    def BinaryOperatorNode(self, node: BinaryOperatorNode):
         res = RuntimeResult()
+
         left = res.register(self.run(node.left_node))
         if res.error:
             return res
+
         right = res.register(self.run(node.right_node))
         if res.error:
             return res
+
         if node.operator_token.type == LAW.SUM:
             result, error = left.sum(right)
         elif node.operator_token.type == LAW.SUB:
@@ -114,16 +115,24 @@ class Interpreter:
             result, error = left.less_than(right)
         elif node.operator_token.type == LAW.LTE:
             result, error = left.less_than_equals(right)
-        elif node.operator_token.equals(LAW.KEY, "AND"):
-            result, error = left.and_expression(right)
-        elif node.operator_token.equals(LAW.KEY, "OR"):
-            result, error = left.or_expression(right)
+        else:
+            return res.failure(
+                RuntimeError(
+                    node.start_position,
+                    node.final_position,
+                    f"Unknown binary operator {node.operator_token.type}"
+                )
+            )
+
         if error:
             return res.failure(error)
-        else:
+
+        if hasattr(result, 'set_position'):
             return res.success(
                 result.set_position(node.start_position, node.final_position)
             )
+        else:
+            return res.success(result)
 
     def ForNode(self, node: ForNode):
         res = RuntimeResult()
@@ -137,19 +146,16 @@ class Interpreter:
         step_value = res.register(self.run(node.step_value)) if node.step_value else Number(1)
 
         i = start_value
-        # Usar los valores booleanos para la comparación
         while True:
             condition_met, error = i.less_than(end_value) if step_value.greater_than(Number(0))[0] else i.greater_than(
                 end_value)
             if error or not condition_met:
                 break
 
-            # Ejecutar el cuerpo del ciclo
             res.register(self.run(node.body_node))
             if res.error:
                 return res
 
-            # Actualizar la variable de control
             i, error = i.sum(step_value)
             if error:
                 return res.failure(error)
@@ -157,9 +163,32 @@ class Interpreter:
         return res.success(None)
 
     def PrintNode(self, node: PrintNode):
-        value = self.run(node.value).value  # Ejecuta la expresión y obtiene el valor
-        print(value)  # Imprime el valor en la consola
-        return RuntimeResult().success(None)  # Devuelve un resultado exitoso
+        value = self.run(node.value).value
+        print(value)
+        return RuntimeResult().success(None)
+
+    def WhileNode(self, node: WhileNode):
+        res = RuntimeResult()
+
+        while True:
+            condition_value = res.register(self.run(node.condition_node))
+            if res.error:
+                return res.failure(res.error)
+
+            if hasattr(condition_value, 'value'):
+                condition_is_true = condition_value.value
+            else:
+                condition_is_true = condition_value
+
+            if not condition_is_true:
+                break
+
+
+            res.register(self.run(node.body_node))
+            if res.error:
+                return res
+
+        return res.success(None)
 
     def UnaryOperatorNode(
         self,
