@@ -3,7 +3,9 @@ from typing import Union
 from model.Node.AccessVariableNode import AccessVariableNode
 from model.Node.AssignVariableNode import AssignVariableNode
 from model.Node.BinaryOperatorNode import BinaryOperatorNode
+from model.Node.ForNode import ForNode
 from model.Node.ListNode import ListNode
+from model.Node.PrintNode import PrintNode
 from model.Node.StringNode import StringNode
 from model.String import String
 from model.Node.NumberNode import NumberNode
@@ -122,6 +124,42 @@ class Interpreter:
             return res.success(
                 result.set_position(node.start_position, node.final_position)
             )
+
+    def ForNode(self, node: ForNode):
+        res = RuntimeResult()
+
+        start_value = res.register(self.run(node.start_value))
+        if res.error:
+            return res
+        end_value = res.register(self.run(node.end_value))
+        if res.error:
+            return res
+        step_value = res.register(self.run(node.step_value)) if node.step_value else Number(1)
+
+        i = start_value
+        # Usar los valores booleanos para la comparación
+        while True:
+            condition_met, error = i.less_than(end_value) if step_value.greater_than(Number(0))[0] else i.greater_than(
+                end_value)
+            if error or not condition_met:
+                break
+
+            # Ejecutar el cuerpo del ciclo
+            res.register(self.run(node.body_node))
+            if res.error:
+                return res
+
+            # Actualizar la variable de control
+            i, error = i.sum(step_value)
+            if error:
+                return res.failure(error)
+
+        return res.success(None)
+
+    def PrintNode(self, node: PrintNode):
+        value = self.run(node.value).value  # Ejecuta la expresión y obtiene el valor
+        print(value)  # Imprime el valor en la consola
+        return RuntimeResult().success(None)  # Devuelve un resultado exitoso
 
     def UnaryOperatorNode(
         self,

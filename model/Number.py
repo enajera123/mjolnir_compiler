@@ -41,32 +41,35 @@ class Number:
         if isinstance(another, Number):
             return Number(self.value != another.value), None
 
+    # Métodos de comparación que devuelven booleanos
     def greater_than(self, another):
         if isinstance(another, Number):
-            return Number(self.value > another.value), None
+            return self.value > another.value, None
 
     def greater_than_equals(self, another):
         if isinstance(another, Number):
-            return Number(self.value >= another.value), None
+            return self.value >= another.value, None
 
     def less_than(self, another):
         if isinstance(another, Number):
-            return Number(self.value < another.value), None
+            return self.value < another.value, None
 
     def less_than_equals(self, another):
         if isinstance(another, Number):
-            return Number(self.value <= another.value), None
+            return self.value <= another.value, None
 
+    # Operadores lógicos que devuelven booleanos
     def and_expression(self, another):
         if isinstance(another, Number):
-            return Number(self.value and another.value), None
+            return self.value and another.value, None
 
     def or_expression(self, another):
         if isinstance(another, Number):
-            return Number(self.value or another.value), None
+            return self.value or another.value, None
 
     def not_expression(self):
-        return Number(not self.value), None
+        return not self.value, None
 
     def __repr__(self):
         return str(self.value)
+

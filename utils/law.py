@@ -26,6 +26,8 @@ class LAW:
     GTE = "GTE"
     LP = "LP"  # Left Parenthesis
     RP = "RP"  # Right Parenthesis
+    LCB = "LCB"  # Left Curly Brace '{'
+    RCB = "RCB"  # Right Curly Brace '}'
     RESERVED_WORDS = [
         "VAR",
         "PRINT",

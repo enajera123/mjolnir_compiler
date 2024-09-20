@@ -149,11 +149,17 @@ class Lexer:
             elif self.current_char == ")":
                 tokens.append(Token(LAW.RP, start_position=self.position))
                 self.next_character()
+            elif self.current_char == "{":  # Reconoce '{'
+                tokens.append(Token(LAW.LCB, start_position=self.position))
+                self.next_character()
+            elif self.current_char == "}":  # Reconoce '}'
+                tokens.append(Token(LAW.RCB, start_position=self.position))
+                self.next_character()
             else:
                 pos_start = self.position.copy()
                 char = self.current_char
                 self.next_character()
                 return [], IllegalCharError(pos_start, self.position, "'" + char + "'")
         tokens.append(Token(LAW.END_OF_FILE, start_position=self.position))
-        print(tokens)
         return tokens, None
+
