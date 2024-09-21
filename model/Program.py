@@ -10,6 +10,7 @@ class Program:
         if error:
             return None, error
         parser = Parser(tokens)
+        
         tree = parser.run()
         if tree.error:
             return None, tree.error

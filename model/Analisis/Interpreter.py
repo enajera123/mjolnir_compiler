@@ -84,15 +84,12 @@ class Interpreter:
 
     def BinaryOperatorNode(self, node: BinaryOperatorNode):
         res = RuntimeResult()
-
         left = res.register(self.run(node.left_node))
         if res.error:
             return res
-
         right = res.register(self.run(node.right_node))
         if res.error:
             return res
-
         if node.operator_token.type == LAW.SUM:
             result, error = left.sum(right)
         elif node.operator_token.type == LAW.SUB:
@@ -168,6 +165,7 @@ class Interpreter:
     def IfNode(self, node: IfNode):
         res = RuntimeResult()
         for condition, expression in node.cases:
+
             value = res.register(self.run(condition))
             if res.error:
                 return res
@@ -176,12 +174,12 @@ class Interpreter:
                 if res.error:
                     return res
                 return res.success(result)
-            if node.else_case:
-                else_case = node.else_case
-                result = res.register(self.run(else_case))
-                if res.error:
-                    return res
-                return res.success(result)
+        if node.else_case:
+            else_case = node.else_case
+            result = res.register(self.run(else_case))
+            if res.error:
+                return res
+            return res.success(result)
 
     def PrintNode(self, node: PrintNode):
         value = self.run(node.value).value

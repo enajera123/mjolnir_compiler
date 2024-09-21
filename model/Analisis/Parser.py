@@ -95,7 +95,7 @@ class Parser:
         res = RunResult()
         if self.current_token.equals(LAW.KEY, "NOT"):
             operator_token = self.current_token
-            self.advance()
+            res.register(self.advance())
             node = res.register(self.compare_expression())
             if res.error:
                 return res
@@ -197,7 +197,6 @@ class Parser:
             if res.error:
                 return res
             lines.append(line)
-
         return res.success(
             ListNode(lines, start_position, self.current_token.final_position)
         )
@@ -234,10 +233,185 @@ class Parser:
                 )
             )
         return res
+    def if_statement(self):
+
+        res = RunResult()
+
+        cases = []
+
+        else_case = None
+
+
+
+        # IF clause
+
+        if not self.current_token.equals(LAW.RW, "IF"):
+
+            return res.failure(InvalidSyntaxError(
+
+                self.current_token.start_position,
+
+                self.current_token.final_position,
+
+                "Expected 'IF'"
+
+            ))
+
+        res.register(self.advance())
+
+
+
+        condition = res.register(self.expression())
+
+        if res.error: return res
+
+
+
+        if self.current_token.type != LAW.LCB:
+
+            return res.failure(InvalidSyntaxError(
+
+                self.current_token.start_position,
+
+                self.current_token.final_position,
+
+                "Expected '{'"
+
+            ))
+
+        res.register(self.advance())
+
+
+
+        body = res.register(self.lines())
+
+        if res.error: return res
+
+        cases.append((condition, body))
+
+
+
+        if self.current_token.type != LAW.RCB:
+
+            return res.failure(InvalidSyntaxError(
+
+                self.current_token.start_position,
+
+                self.current_token.final_position,
+
+                "Expected '}'"
+
+            ))
+
+        res.register(self.advance())
+
+
+
+        # ELIF clauses
+
+        while self.current_token.equals(LAW.RW, "ELIF"):
+
+            res.register(self.advance())
+
+
+
+            condition = res.register(self.expression())
+
+            if res.error: return res
+
+
+
+            if self.current_token.type != LAW.LCB:
+
+                return res.failure(InvalidSyntaxError(
+
+                    self.current_token.start_position,
+
+                    self.current_token.final_position,
+
+                    "Expected '{'"
+
+                ))
+
+            res.register(self.advance())
+
+
+
+            body = res.register(self.lines())
+
+            if res.error: return res
+
+            cases.append((condition, body))
+
+
+
+            if self.current_token.type != LAW.RCB:
+
+                return res.failure(InvalidSyntaxError(
+
+                    self.current_token.start_position,
+
+                    self.current_token.final_position,
+
+                    "Expected '}'"
+
+                ))
+
+            res.register(self.advance())
+
+
+
+        # ELSE clause
+
+        if self.current_token.equals(LAW.RW, "ELSE"):
+
+            res.register(self.advance())
+
+
+
+            if self.current_token.type != LAW.LCB:
+
+                return res.failure(InvalidSyntaxError(
+
+                    self.current_token.start_position,
+
+                    self.current_token.final_position,
+
+                    "Expected '{'"
+
+                ))
+
+            res.register(self.advance())
+
+
+
+            else_case = res.register(self.lines())
+
+            if res.error: return res
+
+
+
+            if self.current_token.type != LAW.RCB:
+
+                return res.failure(InvalidSyntaxError(
+
+                    self.current_token.start_position,
+
+                    self.current_token.final_position,
+
+                    "Expected '}'"
+
+                ))
+
+            res.register(self.advance())
+
+
+
+        return res.success(IfNode(cases, else_case))
+
 
     def for_expression(self):
         res = RunResult()
-
         if not self.current_token.equals(LAW.RW, "FOR"):
             return res.failure(
                 InvalidSyntaxError(
@@ -332,59 +506,6 @@ class Parser:
             )
         )
 
-    def if_statement(self):
-        res = RunResult()
-        cases = []
-        else_cases = None
-        if not self.current_token.equals(LAW.RW, "IF"):
-            return res.failure(
-                InvalidSyntaxError(
-                    self.current_token.start_position,
-                    self.current_token.final_position,
-                    f"Expected 'IF' expression",
-                )
-            )
-        self.advance()
-        condition = res.register(self.expression())
-        if res.error:
-            return res
-        if not self.current_token.equals(LAW.RW, "THEN"):
-            return res.failure(
-                InvalidSyntaxError(
-                    self.current_tok.pos_start,
-                    self.current_tok.pos_end,
-                    f"Expected 'THEN'",
-                )
-            )
-        self.advance()
-        if_condition = res.register(self.expression())
-        if res.error:return res
-        cases.append((condition, if_condition))
-        while self.current_token.equals(LAW.RW, "ELIF"):
-            self.advance()
-            if_condition = res.register(self.expression())
-            if res.error:
-                return res
-            if not self.current_token.equals(LAW.RW, "THEN"):
-                return res.failure(
-                    InvalidSyntaxError(
-                        self.current_token.start_position,
-                        self.current_token.final_position,
-                        f"Expected 'THEN' expression",
-                    )
-                )
-            self.advance()
-            if_condition = res.register(self.expression())
-            if res.error:
-                return res
-            cases.append((condition, if_condition))
-        if self.current_token.equals(LAW.RW, "ELSE"):
-            self.advance()
-            else_cases = res.register(self.expression())
-            if res.error:
-                return res
-        return res.success(IfNode(cases, else_cases))
-
     def print_statement(self):
         res = RunResult()
 
@@ -428,7 +549,6 @@ class Parser:
                 )
             )
         res.register(self.advance())
-
         condition = res.register(self.expression())
         if res.error:
             return res
@@ -454,7 +574,6 @@ class Parser:
         res.register(self.advance())
 
         body = res.register(self.lines())
-        print(body)
         if res.error:
             return res
 

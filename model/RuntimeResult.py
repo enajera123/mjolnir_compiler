@@ -4,6 +4,7 @@ class RuntimeResult:
         self.error = None
 
     def register(self, result):
+        if not result: return None
         if result.error:
             self.error = result.error
         return result.value
