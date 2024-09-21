@@ -42,9 +42,7 @@ class Interpreter:
             elements.append(value)
         return res.success(elements)
 
-    def AccessVariableNode(
-        self, node: AccessVariableNode
-    ):
+    def AccessVariableNode(self, node: AccessVariableNode):
         res = RuntimeResult()
         variable_name = node.variable_token.value
         value = LAW.SYMBOL_TABLE.get(variable_name)
@@ -120,14 +118,14 @@ class Interpreter:
                 RuntimeError(
                     node.start_position,
                     node.final_position,
-                    f"Unknown binary operator {node.operator_token.type}"
+                    f"Unknown binary operator {node.operator_token.type}",
                 )
             )
 
         if error:
             return res.failure(error)
 
-        if hasattr(result, 'set_position'):
+        if hasattr(result, "set_position"):
             return res.success(
                 result.set_position(node.start_position, node.final_position)
             )
@@ -143,12 +141,17 @@ class Interpreter:
         end_value = res.register(self.run(node.end_value))
         if res.error:
             return res
-        step_value = res.register(self.run(node.step_value)) if node.step_value else Number(1)
+        step_value = (
+            res.register(self.run(node.step_value)) if node.step_value else Number(1)
+        )
 
         i = start_value
         while True:
-            condition_met, error = i.less_than(end_value) if step_value.greater_than(Number(0))[0] else i.greater_than(
-                end_value)
+            condition_met, error = (
+                i.less_than(end_value)
+                if step_value.greater_than(Number(0))[0]
+                else i.greater_than(end_value)
+            )
             if error or not condition_met:
                 break
 
@@ -161,6 +164,24 @@ class Interpreter:
                 return res.failure(error)
 
         return res.success(None)
+
+    def IfNode(self, node: IfNode):
+        res = RuntimeResult()
+        for condition, expression in node.cases:
+            value = res.register(self.run(condition))
+            if res.error:
+                return res
+            if value.is_true():
+                result = res.register(self.run(expression))
+                if res.error:
+                    return res
+                return res.success(result)
+            if node.else_case:
+                else_case = node.else_case
+                result = res.register(self.run(else_case))
+                if res.error:
+                    return res
+                return res.success(result)
 
     def PrintNode(self, node: PrintNode):
         value = self.run(node.value).value
@@ -175,14 +196,13 @@ class Interpreter:
             if res.error:
                 return res.failure(res.error)
 
-            if hasattr(condition_value, 'value'):
+            if hasattr(condition_value, "value"):
                 condition_is_true = condition_value.value
             else:
                 condition_is_true = condition_value
 
             if not condition_is_true:
                 break
-
 
             res.register(self.run(node.body_node))
             if res.error:

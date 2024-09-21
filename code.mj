@@ -1,9 +1,10 @@
-VAR a = 1*2
-VAR b = 3
-VAR c = "Hola soy esteban"
-VAR d = TRUE
-VAR i = 1
-
-WHILE (i > 10) {
-    PRINT(i)
+PRINT(10)
+PRINT(FALSE)
+PRINT(TRUE)
+PRINT(NULL)
+PRINT("hola mi nombre es esteban")
+VAR sum = VAR i = 1
+WHILE(i<100){
+    PRINT(VAR sum = sum+1)
+    VAR i = i+1
 }

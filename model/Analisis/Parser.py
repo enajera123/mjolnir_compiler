@@ -10,6 +10,7 @@ from model.Node.NumberNode import NumberNode
 from model.Node.StringNode import StringNode
 from model.Node.AssignVariableNode import AssignVariableNode
 from model.Node.UnaryOperatorNode import UnaryOperatorNode
+from model.Node.IfNode import IfNode
 
 
 class Parser:
@@ -38,6 +39,11 @@ class Parser:
         elif token.type == LAW.IDENTIFIER:
             result.register(self.advance())
             return result.success(AccessVariableNode(token))
+        elif token.equals(LAW.RW, "IF"):
+            expression = result.register(self.if_statement())
+            if result.error:
+                return result
+            return result.success(expression)
         elif token.type == LAW.STRING:
             result.register(self.advance())
             return result.success(StringNode(token))
@@ -96,7 +102,8 @@ class Parser:
             return res.success(UnaryOperatorNode(operator_token, node))
         node = res.register(
             self.binary_operation(
-                self.comparison_expresion, (LAW.EQ, LAW.NEQ, LAW.LT, LAW.GT, LAW.LTE, LAW.GTE)
+                self.comparison_expresion,
+                (LAW.EQ, LAW.NEQ, LAW.LT, LAW.GT, LAW.LTE, LAW.GTE),
             )
         )
 
@@ -113,33 +120,36 @@ class Parser:
     def comparison_expresion(self):
         return self.binary_operation(self.term, (LAW.SUM, LAW.SUB))
 
+    def var_expression(self, res):
+        res.register(self.advance())
+        if self.current_token.type != LAW.IDENTIFIER:
+            return res.failure(
+                InvalidSyntaxError(
+                    self.current_token.start_position,
+                    self.current_token.final_position,
+                    f"Expected identifier Got {self.current_token.type}",
+                )
+            )
+        var_name = self.current_token
+        res.register(self.advance())
+        if self.current_token.type != LAW.EQUALS:
+            return res.failure(
+                InvalidSyntaxError(
+                    self.current_token.start_position,
+                    self.current_token.final_position,
+                    f"Expected '=' Got {self.current_token.type}",
+                )
+            )
+        res.register(self.advance())
+        value = res.register(self.expression())
+        if res.error:
+            return res
+        return res.success(AssignVariableNode(var_name, value))
+
     def expression(self):
         res = RunResult()
         if self.current_token.equals(LAW.RW, "VAR"):
-            res.register(self.advance())
-            if self.current_token.type != LAW.IDENTIFIER:
-                return res.failure(
-                    InvalidSyntaxError(
-                        self.current_token.start_position,
-                        self.current_token.final_position,
-                        f"Expected identifier Got {self.current_token.type}",
-                    )
-                )
-            var_name = self.current_token
-            res.register(self.advance())
-            if self.current_token.type != LAW.EQUALS:
-                return res.failure(
-                    InvalidSyntaxError(
-                        self.current_token.start_position,
-                        self.current_token.final_position,
-                        f"Expected '=' Got {self.current_token.type}",
-                    )
-                )
-            res.register(self.advance())
-            value = res.register(self.expression())
-            if res.error:
-                return res
-            return res.success(AssignVariableNode(var_name, value))
+            return self.var_expression(res)
         node = res.register(
             self.binary_operation(
                 self.compare_expression, ((LAW.KEY, "AND"), (LAW.KEY, "OR"))
@@ -168,7 +178,10 @@ class Parser:
             return res
         lines.append(line)
 
-        while self.current_token.type == LAW.END_LINE or self.current_token.type != LAW.RCB:
+        while (
+            self.current_token.type == LAW.END_LINE
+            or self.current_token.type != LAW.RCB
+        ):
             while self.current_token.type == LAW.END_LINE:
                 res.register(self.advance())
 
@@ -176,19 +189,22 @@ class Parser:
                 break
 
             if self.current_token.type == LAW.END_OF_FILE:
-                return res.success(ListNode(lines, start_position, self.current_token.final_position))
+                return res.success(
+                    ListNode(lines, start_position, self.current_token.final_position)
+                )
 
             line = res.register(self.line())
             if res.error:
                 return res
             lines.append(line)
 
-        return res.success(ListNode(lines, start_position, self.current_token.final_position))
+        return res.success(
+            ListNode(lines, start_position, self.current_token.final_position)
+        )
 
     def line(self):
         res = RunResult()
         initial_position = self.current_token.start_position
-
         if self.current_token.equals(LAW.RW, "FOR"):
             return res.register(self.for_expression())
         elif self.current_token.equals(LAW.RW, "PRINT"):
@@ -224,8 +240,11 @@ class Parser:
 
         if not self.current_token.equals(LAW.RW, "FOR"):
             return res.failure(
-                InvalidSyntaxError(self.current_token.start_position, self.current_token.final_position,
-                                   "Expected 'FOR'")
+                InvalidSyntaxError(
+                    self.current_token.start_position,
+                    self.current_token.final_position,
+                    "Expected 'FOR'",
+                )
             )
 
         res.register(self.advance())
@@ -233,15 +252,22 @@ class Parser:
         # Leer variable de control
         if self.current_token.type != LAW.IDENTIFIER:
             return res.failure(
-                InvalidSyntaxError(self.current_token.start_position, self.current_token.final_position,
-                                   "Expected variable identifier")
+                InvalidSyntaxError(
+                    self.current_token.start_position,
+                    self.current_token.final_position,
+                    "Expected variable identifier",
+                )
             )
         var_name = self.current_token
         res.register(self.advance())
 
         if self.current_token.type != LAW.EQUALS:
             return res.failure(
-                InvalidSyntaxError(self.current_token.start_position, self.current_token.final_position, "Expected '='")
+                InvalidSyntaxError(
+                    self.current_token.start_position,
+                    self.current_token.final_position,
+                    "Expected '='",
+                )
             )
         res.register(self.advance())
 
@@ -251,8 +277,11 @@ class Parser:
 
         if not self.current_token.equals(LAW.RW, "TO"):
             return res.failure(
-                InvalidSyntaxError(self.current_token.start_position, self.current_token.final_position,
-                                   "Expected 'TO'")
+                InvalidSyntaxError(
+                    self.current_token.start_position,
+                    self.current_token.final_position,
+                    "Expected 'TO'",
+                )
             )
         res.register(self.advance())
 
@@ -269,7 +298,11 @@ class Parser:
 
         if self.current_token.type != LAW.LCB:
             return res.failure(
-                InvalidSyntaxError(self.current_token.start_position, self.current_token.final_position, "Expected '{'")
+                InvalidSyntaxError(
+                    self.current_token.start_position,
+                    self.current_token.final_position,
+                    "Expected '{'",
+                )
             )
         res.register(self.advance())
 
@@ -279,20 +312,89 @@ class Parser:
 
         if self.current_token.type != LAW.RCB:
             return res.failure(
-                InvalidSyntaxError(self.current_token.start_position, self.current_token.final_position, "Expected '}'")
+                InvalidSyntaxError(
+                    self.current_token.start_position,
+                    self.current_token.final_position,
+                    "Expected '}'",
+                )
             )
         res.register(self.advance())
 
         return res.success(
-            ForNode(var_name, start_value, end_value, step_value, body, var_name.start_position, body.final_position))
+            ForNode(
+                var_name,
+                start_value,
+                end_value,
+                step_value,
+                body,
+                var_name.start_position,
+                body.final_position,
+            )
+        )
+
+    def if_statement(self):
+        res = RunResult()
+        cases = []
+        else_cases = None
+        if not self.current_token.equals(LAW.RW, "IF"):
+            return res.failure(
+                InvalidSyntaxError(
+                    self.current_token.start_position,
+                    self.current_token.final_position,
+                    f"Expected 'IF' expression",
+                )
+            )
+        self.advance()
+        condition = res.register(self.expression())
+        if res.error:
+            return res
+        if not self.current_token.equals(LAW.RW, "THEN"):
+            return res.failure(
+                InvalidSyntaxError(
+                    self.current_tok.pos_start,
+                    self.current_tok.pos_end,
+                    f"Expected 'THEN'",
+                )
+            )
+        self.advance()
+        if_condition = res.register(self.expression())
+        if res.error:return res
+        cases.append((condition, if_condition))
+        while self.current_token.equals(LAW.RW, "ELIF"):
+            self.advance()
+            if_condition = res.register(self.expression())
+            if res.error:
+                return res
+            if not self.current_token.equals(LAW.RW, "THEN"):
+                return res.failure(
+                    InvalidSyntaxError(
+                        self.current_token.start_position,
+                        self.current_token.final_position,
+                        f"Expected 'THEN' expression",
+                    )
+                )
+            self.advance()
+            if_condition = res.register(self.expression())
+            if res.error:
+                return res
+            cases.append((condition, if_condition))
+        if self.current_token.equals(LAW.RW, "ELSE"):
+            self.advance()
+            else_cases = res.register(self.expression())
+            if res.error:
+                return res
+        return res.success(IfNode(cases, else_cases))
 
     def print_statement(self):
         res = RunResult()
 
         if not self.current_token.equals(LAW.RW, "PRINT"):
             return res.failure(
-                InvalidSyntaxError(self.current_token.start_position, self.current_token.final_position,
-                                   "Expected 'PRINT'")
+                InvalidSyntaxError(
+                    self.current_token.start_position,
+                    self.current_token.final_position,
+                    "Expected 'PRINT'",
+                )
             )
 
         res.register(self.advance())
@@ -308,16 +410,22 @@ class Parser:
 
         if not self.current_token.equals(LAW.RW, "WHILE"):
             return res.failure(
-                InvalidSyntaxError(self.current_token.start_position, self.current_token.final_position,
-                                   "Expected 'WHILE'")
+                InvalidSyntaxError(
+                    self.current_token.start_position,
+                    self.current_token.final_position,
+                    "Expected 'WHILE'",
+                )
             )
 
         res.register(self.advance())
 
         if self.current_token.type != LAW.LP:
             return res.failure(
-                InvalidSyntaxError(self.current_token.start_position, self.current_token.final_position,
-                                   "Expected '(' after 'WHILE'")
+                InvalidSyntaxError(
+                    self.current_token.start_position,
+                    self.current_token.final_position,
+                    "Expected '(' after 'WHILE'",
+                )
             )
         res.register(self.advance())
 
@@ -327,30 +435,42 @@ class Parser:
 
         if self.current_token.type != LAW.RP:
             return res.failure(
-                InvalidSyntaxError(self.current_token.start_position, self.current_token.final_position,
-                                   "Expected ')' after condition")
+                InvalidSyntaxError(
+                    self.current_token.start_position,
+                    self.current_token.final_position,
+                    "Expected ')' after condition",
+                )
             )
         res.register(self.advance())
 
         if self.current_token.type != LAW.LCB:
             return res.failure(
-                InvalidSyntaxError(self.current_token.start_position, self.current_token.final_position,
-                                   "Expected '{' after condition")
+                InvalidSyntaxError(
+                    self.current_token.start_position,
+                    self.current_token.final_position,
+                    "Expected '{' after condition",
+                )
             )
         res.register(self.advance())
 
         body = res.register(self.lines())
+        print(body)
         if res.error:
             return res
 
         if self.current_token.type != LAW.RCB:
             return res.failure(
-                InvalidSyntaxError(self.current_token.start_position, self.current_token.final_position,
-                                   "Expected '}' after body")
+                InvalidSyntaxError(
+                    self.current_token.start_position,
+                    self.current_token.final_position,
+                    "Expected '}' after body",
+                )
             )
         res.register(self.advance())
 
-        return res.success(WhileNode(condition, body, condition.start_position, body.final_position))
+        return res.success(
+            WhileNode(condition, body, condition.start_position, body.final_position)
+        )
 
 
 class RunResult:

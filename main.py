@@ -14,11 +14,10 @@ from model.Program import Program
 #     sys.exit(app.exec_())
 if __name__ == "__main__":
     text = open("code.mj", "r").read()
-    print(text)
     results, error = Program.run("<stdin>", text)
     if error:
         print(error)
-    else:
-        for result in results:
-            print(result)
+    # else:
+    #     for result in results:
+    #         print(result)
 

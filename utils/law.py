@@ -10,15 +10,15 @@ class LAW:
     STRING = "STRING"
     END_OF_FILE = "END"
     END_LINE = "END_LINE"
-    RW = "RW"
-    KEY = "KEY"
+    RW = "RW" # Reserved Word
+    KEY = "KEY" 
     IDENTIFIER = "IDENTIFIER"
-    EQUALS = "EQUALS"
+    EQUALS = "EQUALS" # Asignation equals
     SUM = "SUM"
     SUB = "SUB"
     MUL = "MUL"
     DIV = "DIV"
-    EQ = "EQ"
+    EQ = "EQ" # Comparison equals
     NEQ = "NEQ"
     LT = "LT"
     GT = "GT"
@@ -33,6 +33,8 @@ class LAW:
         "PRINT",
         "IF",
         "ELSE",
+        "THEN",
+        "ELIF",
         "WHILE",
         "FOR",
         "TO",
