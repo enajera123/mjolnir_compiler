@@ -118,6 +118,9 @@ class Lexer:
                 tokens.append(self.make_reserved_word())
             elif self.current_char in LAW.DIGITS:
                 tokens.append(self.make_number())
+            elif self.current_char == ":":
+                tokens.append(Token(LAW.COLON, start_position=self.position))
+                self.next_character()
             elif self.current_char == "+":
                 tokens.append(Token(LAW.SUM, start_position=self.position))
                 self.next_character()

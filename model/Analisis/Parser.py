@@ -1,5 +1,6 @@
 from model.Node.ForNode import ForNode
 from model.Node.PrintNode import PrintNode
+from model.Node.SwitchNode import SwitchNode
 from model.Node.WhileNode import WhileNode
 from utils.law import LAW
 from model.Error.InvalidSyntaxError import InvalidSyntaxError
@@ -150,6 +151,8 @@ class Parser:
         res = RunResult()
         if self.current_token.equals(LAW.RW, "VAR"):
             return self.var_expression(res)
+        if self.current_token.equals(LAW.RW, "SWITCH"):
+            return res.register(self.switch_expression())
         node = res.register(
             self.binary_operation(
                 self.compare_expression, ((LAW.KEY, "AND"), (LAW.KEY, "OR"))
@@ -203,14 +206,14 @@ class Parser:
 
     def line(self):
         res = RunResult()
-        initial_position = self.current_token.start_position
         if self.current_token.equals(LAW.RW, "FOR"):
             return res.register(self.for_expression())
         elif self.current_token.equals(LAW.RW, "PRINT"):
             return res.register(self.print_statement())
         elif self.current_token.equals(LAW.RW, "WHILE"):
             return res.register(self.while_expression())
-
+        elif self.current_token.equals(LAW.RW, "SWITCH"):
+            return res.register(self.switch_expression())
         expression = res.register(self.expression())
         if res.error:
             return res.failure(
@@ -590,6 +593,122 @@ class Parser:
         return res.success(
             WhileNode(condition, body, condition.start_position, body.final_position)
         )
+
+    def switch_expression(self):
+        res = RunResult()
+
+        cases = []
+        default_case = None
+
+        if not self.current_token.equals(LAW.RW, "SWITCH"):
+            return res.failure(
+                InvalidSyntaxError(
+                    self.current_token.start_position,
+                    self.current_token.final_position,
+                    "Expected 'SWITCH'"
+                )
+            )
+
+        res.register(self.advance())
+
+        if self.current_token.type != LAW.LP:
+            return res.failure(
+                InvalidSyntaxError(
+                    self.current_token.start_position,
+                    self.current_token.final_position,
+                    "Expected '(' after 'SWITCH'"
+                )
+            )
+        res.register(self.advance())
+
+        switch_expression = res.register(self.expression())
+        if res.error:
+            return res
+
+        if self.current_token.type != LAW.RP:
+            return res.failure(
+                InvalidSyntaxError(
+                    self.current_token.start_position,
+                    self.current_token.final_position,
+                    "Expected ')' after switch expression"
+                )
+            )
+        res.register(self.advance())
+
+        if self.current_token.type != LAW.LCB:
+            return res.failure(
+                InvalidSyntaxError(
+                    self.current_token.start_position,
+                    self.current_token.final_position,
+                    "Expected '{' after switch expression"
+                )
+            )
+        res.register(self.advance())
+
+        while self.current_token.equals(LAW.RW, "CASE") or self.current_token.equals(LAW.RW, "DEFAULT"):
+            if self.current_token.equals(LAW.RW, "CASE"):
+                res.register(self.advance())
+
+                case_value = res.register(self.expression())
+                if res.error:
+                    return res
+
+                if self.current_token.type != LAW.COLON:
+                    return res.failure(
+                        InvalidSyntaxError(
+                            self.current_token.start_position,
+                            self.current_token.final_position,
+                            "Expected ':' after case value"
+                        )
+                    )
+                res.register(self.advance())
+
+                case_body = res.register(self.lines())
+                if res.error:
+                    return res
+
+                cases.append((case_value, case_body))
+
+                if self.current_token.type != LAW.RCB and not self.current_token.equals(LAW.RW,
+                                                                                        "DEFAULT") and not self.current_token.equals(
+                        LAW.RW, "CASE"):
+                    return res.failure(
+                        InvalidSyntaxError(
+                            self.current_token.start_position,
+                            self.current_token.final_position,
+                            "Expected '}' or another 'CASE' or 'DEFAULT'"
+                        )
+                    )
+
+            elif self.current_token.equals(LAW.RW, "DEFAULT"):
+                res.register(self.advance())
+
+                if self.current_token.type != LAW.COLON:
+                    return res.failure(
+                        InvalidSyntaxError(
+                            self.current_token.start_position,
+                            self.current_token.final_position,
+                            "Expected ':' after 'DEFAULT'"
+                        )
+                    )
+                res.register(self.advance())
+
+                default_case = res.register(self.lines())
+                if res.error:
+                    return res
+
+        if self.current_token.type != LAW.RCB:
+            return res.failure(
+                InvalidSyntaxError(
+                    self.current_token.start_position,
+                    self.current_token.final_position,
+                    "Expected '}' at the end of switch statement"
+                )
+            )
+        res.register(self.advance())
+
+        return res.success(SwitchNode(switch_expression, cases, default_case, switch_expression.start_position,
+                                      self.current_token.final_position))
 
 
 class RunResult:

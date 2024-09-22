@@ -4,9 +4,11 @@ from model.Node.AccessVariableNode import AccessVariableNode
 from model.Node.AssignVariableNode import AssignVariableNode
 from model.Node.BinaryOperatorNode import BinaryOperatorNode
 from model.Node.ForNode import ForNode
+from model.Node.IfNode import IfNode
 from model.Node.ListNode import ListNode
 from model.Node.PrintNode import PrintNode
 from model.Node.StringNode import StringNode
+from model.Node.SwitchNode import SwitchNode
 from model.Node.WhileNode import WhileNode
 from model.String import String
 from model.Node.NumberNode import NumberNode
@@ -229,3 +231,30 @@ class Interpreter:
             return res.success(
                 number.set_position(node.start_position, node.final_position)
             )
+
+    def SwitchNode(self, node: SwitchNode):
+        res = RuntimeResult()
+        switch_value = res.register(self.run(node.switch_expression))
+        if res.error:
+            return res
+        case_executed = False
+        for case_value, case_body in node.cases:
+            case_result = res.register(self.run(case_value))
+            if res.error:
+                return res
+            if case_result.value == switch_value.value:
+                case_executed = True
+                res.register(self.run(case_body))
+                if res.error:
+                    return res
+                break
+        if not case_executed and node.default_case:
+            res.register(self.run(node.default_case))
+            if res.error:
+                return res
+
+        return res.success(None)
+
+
+
+
