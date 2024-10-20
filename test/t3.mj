@@ -1,0 +1,9 @@
+SAGA("Ingresa tu Edad")
+RUNE edad = RAGNAR_INT()
+ODIN(edad > 18)YGGDRASIL
+    SAGA("Eres mayor de edad")
+FRIGG(edad == 18)YGGDRASIL
+    SAGA("Tienes exactamente 18 años")
+FENRIR 
+    SAGA("Eres menor de edad")
+RAGNAROK

@@ -1,0 +1,9 @@
+MAGIC calcular_area(radio)
+    VALKYRIE MIDGARD_PI * radio * radio
+RAGNAROK
+
+SAGA("Ingresa el radio del círculo:")
+RUNE radio = RAGNAR_INT()
+SAGA(radio)
+SAGA("El área del círculo es:")
+SAGA(calcular_area(radio))

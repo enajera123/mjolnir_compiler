@@ -1,0 +1,9 @@
+RUNE i = 1
+ASGARD i <= 10 YGGDRASIL
+    ODIN(i == 7)YGGDRASIL
+        SAGA(i)
+        JORMUNGAND
+    RAGNAROK
+    SAGA(i)
+    RUNE i = i + 1
+RAGNAROK

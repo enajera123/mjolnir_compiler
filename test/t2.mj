@@ -1,0 +1,12 @@
+RUNE runa1 = 10
+RUNE runa2 = 5
+
+RUNE suma = runa1 + runa2
+RUNE resta = runa1 - runa2
+RUNE multiplicacion = runa1 * runa2
+RUNE division = runa1 / runa2
+
+SAGA(suma)
+SAGA(resta)
+SAGA(multiplicacion)
+SAGA(division)
