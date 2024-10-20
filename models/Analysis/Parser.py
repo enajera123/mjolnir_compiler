@@ -16,7 +16,7 @@ from ..Nodes.ReturnNode import ReturnNode
 from ..Nodes.ContinueNode import ContinueNode
 from ..Nodes.BreakNode import BreakNode
 from ..Nodes.ListNode import ListNode
-
+from ..Nodes.SwitchNode import SwitchNode
 
 class Parser:
     def __init__(self, tokens):
@@ -57,16 +57,16 @@ class Parser:
         statements = []
         pos_start = self.current_tok.pos_start.copy()
 
+        # Salta los NEWLINE iniciales
         while self.current_tok.type == TT_NEWLINE:
             res.register_advancement()
             self.advance()
 
+        # Procesa la primera declaración
         statement = res.register(self.statement())
         if res.error:
             return res
         statements.append(statement)
-
-        more_statements = True
 
         while True:
             newline_count = 0
@@ -74,21 +74,27 @@ class Parser:
                 res.register_advancement()
                 self.advance()
                 newline_count += 1
-            if newline_count == 0:
-                more_statements = False
 
-            if not more_statements:
+            if newline_count == 0:
                 break
+
+            # Si el token actual es una palabra clave de fin de bloque, detiene el procesamiento
+            if self.current_tok.matches(TT_KEYWORD, 'SURTR') or \
+            self.current_tok.matches(TT_KEYWORD, 'FENRIR') or \
+            self.current_tok.matches(TT_KEYWORD, 'RAGNAROK'):
+                break
+
+            # Intenta procesar otra declaración
             statement = res.try_register(self.statement())
             if not statement:
                 self.reverse(res.to_reverse_count)
-                more_statements = False
-                continue
+                break
             statements.append(statement)
 
         return res.success(
             ListNode(statements, pos_start, self.current_tok.pos_end.copy())
         )
+
 
     def statement(self):
         res = ParseResult()
@@ -104,7 +110,11 @@ class Parser:
             return res.success(
                 ReturnNode(expr, pos_start, self.current_tok.pos_start.copy())
             )
-
+        if self.current_tok.matches(TT_KEYWORD, "HEIMDALL"):
+            switch_expr = res.register(self.switch_expr())
+            if res.error:
+                return res
+            return res.success(switch_expr)
         if self.current_tok.matches(TT_KEYWORD, "SLEIPNIR"):
             res.register_advancement()
             self.advance()
@@ -320,7 +330,7 @@ class Parser:
             if res.error:
                 return res
             return res.success(list_expr)
-
+        
         elif tok.matches(TT_KEYWORD, "ODIN"):
             if_expr = res.register(self.if_expr())
             if res.error:
@@ -707,6 +717,106 @@ class Parser:
             return res
 
         return res.success(WhileNode(condition, body, False))
+
+    def switch_expr(self):
+        res = ParseResult()
+        
+        if not self.current_tok.matches(TT_KEYWORD, "HEIMDALL"):
+            return res.failure(InvalidSyntaxError(
+                self.current_tok.pos_start, self.current_tok.pos_end,
+                "Expected 'HEIMDALL'"
+            ))
+
+        res.register_advancement()
+        self.advance()
+
+        switch_expr = res.register(self.expr())
+        if res.error:
+            return res
+
+        if not self.current_tok.matches(TT_KEYWORD, "YGGDRASIL"):
+            return res.failure(InvalidSyntaxError(
+                self.current_tok.pos_start, self.current_tok.pos_end,
+                "Expected 'YGGDRASIL' after HEIMDALL expression"
+            ))
+
+        res.register_advancement()
+        self.advance()
+
+        cases = []
+        default_case = None
+        self.advance()
+        while self.current_tok.matches(TT_KEYWORD, "SURTR"):
+            res.register_advancement()
+            self.advance()
+
+            case_value = res.register(self.expr())
+            if res.error:
+                return res
+
+            if not self.current_tok.matches(TT_KEYWORD, "YGGDRASIL"):
+                return res.failure(InvalidSyntaxError(
+                    self.current_tok.pos_start, self.current_tok.pos_end,
+                    "Expected 'YGGDRASIL' after SURTR value"
+                ))
+
+            res.register_advancement()
+            self.advance()
+
+            # Procesa el cuerpo del caso
+            if self.current_tok.type == TT_NEWLINE:
+                res.register_advancement()
+                self.advance()
+
+                case_body = res.register(self.statements())
+                if res.error:
+                    return res
+
+                if not self.current_tok.matches(TT_KEYWORD, "RAGNAROK"):
+                    return res.failure(InvalidSyntaxError(
+                        self.current_tok.pos_start, self.current_tok.pos_end,
+                        "Expected 'RAGNAROK' after SURTR body"
+                    ))
+
+                res.register_advancement()
+                self.advance()
+            else:
+                case_body = res.register(self.statement())
+                if res.error:
+                    return res
+            self.advance()
+            cases.append((case_value, case_body))
+
+        # Procesa el caso por defecto
+        if self.current_tok.matches(TT_KEYWORD, "FENRIR"):
+            res.register_advancement()
+            self.advance()
+
+            if self.current_tok.type == TT_NEWLINE:
+                res.register_advancement()
+                self.advance()
+
+                default_case = res.register(self.statements())
+                if res.error:
+                    return res
+
+                if not self.current_tok.matches(TT_KEYWORD, "RAGNAROK"):
+                    return res.failure(InvalidSyntaxError(
+                        self.current_tok.pos_start, self.current_tok.pos_end,
+                        "Expected 'RAGNAROK' after default SURTR"
+                    ))
+
+                res.register_advancement()
+                self.advance()
+            else:
+                default_case = res.register(self.statement())
+                if res.error:
+                    return res
+
+        return res.success(SwitchNode(switch_expr, cases, default_case, switch_expr.pos_start, self.current_tok.pos_end))
+
+
+
 
     def func_def(self):
         res = ParseResult()

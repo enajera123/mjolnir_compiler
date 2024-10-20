@@ -34,6 +34,8 @@ TT_NEWLINE = "NEWLINE"
 TT_EOF = "EOF"
 
 KEYWORDS = [
+    "HEIMDALL", # SWITCH
+    "SURTR", # CASE
     "RUNE",  # VAR
     "FREYR",  # AND
     "LOKI",  # OR

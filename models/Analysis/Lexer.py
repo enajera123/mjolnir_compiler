@@ -127,8 +127,8 @@ class Lexer:
     pos_start = self.pos.copy()
 
     while self.current_char != None and self.current_char in LETTERS_DIGITS + '_':
-      id_str += self.current_char
-      self.advance()
+        id_str += self.current_char
+        self.advance()
 
     tok_type = TT_KEYWORD if id_str in KEYWORDS else TT_IDENTIFIER
     return Token(tok_type, id_str, pos_start, self.pos)

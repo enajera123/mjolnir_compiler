@@ -208,6 +208,37 @@ class Interpreter:
       List(elements).set_context(context).set_pos(node.pos_start, node.pos_end)
     )
 
+  def visit_SwitchNode(self, node, context):
+    res = RTResult()
+    switch_value = res.register(self.visit(node.switch_expr, context))
+    if res.should_return():
+        return res
+
+    matched = False
+
+    # Itera sobre los casos
+    for case_value, case_body in node.cases:
+        case_val = res.register(self.visit(case_value, context))
+        if res.should_return():
+            return res
+
+        # Compara switch_value y case_val con ==
+        if switch_value.value == case_val.value:
+            matched = True
+            case_res = res.register(self.visit(case_body, context))
+            if res.should_return():
+                return res
+            return res.success(case_res)
+
+    # Si no hay coincidencias, ejecuta el caso por defecto si existe
+    if not matched and node.default_case:
+        default_res = res.register(self.visit(node.default_case, context))
+        if res.should_return():
+            return res
+        return res.success(default_res)
+
+    return res.success(Number.null)
+
   def visit_FuncDefNode(self, node, context):
     res = RTResult()
 

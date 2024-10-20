@@ -1,9 +1,13 @@
-MAGIC calcular_area(radio)
-    VALKYRIE MIDGARD_PI * radio * radio
-RAGNAROK
+RUNE runa2 = 5
+SAGA(runa2)
 
-SAGA("Ingresa el radio del círculo:")
-RUNE radio = RAGNAR_INT()
-SAGA(radio)
-SAGA("El área del círculo es:")
-SAGA(calcular_area(radio))
+HEIMDALL runa2 YGGDRASIL
+    SURTR 1 YGGDRASIL
+        SAGA("Es 1")
+    RAGNAROK
+    SURTR 5 YGGDRASIL
+        SAGA("Es 5")
+    RAGNAROK
+    FENRIR
+        SAGA("Caso por defecto")
+    RAGNAROK
