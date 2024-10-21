@@ -1,39 +1,36 @@
 from main import run
+import sys
+from PyQt5.QtWidgets import QApplication
+from controllers.main_controller import main_view
+# while True:
+# 	text = input('odin > ')
+# 	if text.strip() == "": continue
+# 	result, error = run('<valhalla>', text)
 
-while True:
-	text = input('odin > ')
-	if text.strip() == "": continue
-	result, error = run('<valhalla>', text)
-
-	if error:
-		print(f"Error: {error.as_string()}")
-	elif result:
-		if len(result.elements) == 1:
-			print(repr(result.elements[0]))
-		else:
-			print(repr(result))
+# 	if error:
+# 		print(f"Error: {error.as_string()}")
+# 	elif result:
+# 		if len(result.elements) == 1:
+# 			print(repr(result.elements[0]))
+# 		else:
+# 			print(repr(result))
    
    
-# from model.Program import Program
 
-# # import sys
-# # from PyQt5.QtWidgets import QApplication
-# # from controllers.main_controller import main_view
-# # # =======================
-# # # Main
-# # # =======================
 
-# # if __name__ == '__main__':
-# #     app = QApplication(sys.argv)
-# #     main = main_view()
-# #     main.show()
-# #     sys.exit(app.exec_())
+
+# # =======================
+# # Main
+# # =======================
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    main = main_view()
+    main.show()
+    sys.exit(app.exec_())
 # if __name__ == "__main__":
-#     text = open("code.mj", "r").read()
-#     results, error = Program.run("<stdin>", text)
+#     text = open("test/t1.mj", "r").read()
+#     results, error = run("<stdin>", text)
 #     if error:
 #         print(error)
-#     # else:
-#     #     for result in results:
-#     #         print(result)
 

@@ -1,10 +1,14 @@
 from .Error import Error
 from .string_with_arrows import string_with_arrows
 
+
 class RTError(Error):
     def __init__(self, pos_start, pos_end, details, context):
         super().__init__(pos_start, pos_end, "Runtime Error", details)
         self.context = context
+
+    def __repr__(self):
+        return f"{self.as_string()}"
 
     def as_string(self):
         result = self.generate_traceback()

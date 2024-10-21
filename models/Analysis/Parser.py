@@ -674,7 +674,6 @@ class Parser:
 
         res.register_advancement()
         self.advance()
-        print("whilw")
         condition = res.register(self.expr())
         if res.error:
             return res
