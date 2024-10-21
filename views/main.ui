@@ -67,7 +67,6 @@ QPushButton:hover{
          <property name="font">
           <font>
            <pointsize>15</pointsize>
-           <weight>75</weight>
            <bold>true</bold>
           </font>
          </property>
@@ -80,20 +79,76 @@ QPushButton:hover{
         </widget>
        </item>
        <item>
-        <spacer name="horizontalSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Preferred</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>181</width>
-           <height>13</height>
-          </size>
-         </property>
-        </spacer>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QPushButton" name="btn_save">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="font">
+            <font>
+             <italic>false</italic>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>Guardar</string>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>30</width>
+             <height>30</height>
+            </size>
+           </property>
+           <property name="autoRepeatDelay">
+            <number>300</number>
+           </property>
+           <property name="autoDefault">
+            <bool>false</bool>
+           </property>
+           <property name="default">
+            <bool>false</bool>
+           </property>
+           <property name="flat">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btn_open">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="font">
+            <font>
+             <italic>false</italic>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>Cargar</string>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>30</width>
+             <height>30</height>
+            </size>
+           </property>
+           <property name="autoRepeatDelay">
+            <number>300</number>
+           </property>
+           <property name="autoDefault">
+            <bool>false</bool>
+           </property>
+           <property name="default">
+            <bool>false</bool>
+           </property>
+           <property name="flat">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>
@@ -156,6 +211,9 @@ QPushButton:hover{
             <property name="styleSheet">
              <string notr="true">QTextEdit{
 	border: 1px solid #262626;
+    color:white;
+    font:bold;
+    padding:5px;
 }</string>
             </property>
            </widget>
@@ -210,7 +268,6 @@ QPushButton:hover{
               </property>
               <property name="font">
                <font>
-                <weight>75</weight>
                 <italic>false</italic>
                 <bold>true</bold>
                </font>
