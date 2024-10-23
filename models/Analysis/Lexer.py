@@ -1,8 +1,10 @@
 from ..Token import Token
 from ..Errors.IllegalCharError import IllegalCharError
+from ..Errors.RTError import RTError
 from ..Errors.ExpectedCharError import ExpectedCharError
 from ..Position import Position
 from ..Constants import *
+from ..Base.Matrix import Matrix
 class Lexer:
   def __init__(self, fn, text):
     self.fn = fn
@@ -132,6 +134,25 @@ class Lexer:
 
     tok_type = TT_KEYWORD if id_str in KEYWORDS else TT_IDENTIFIER
     return Token(tok_type, id_str, pos_start, self.pos)
+
+  def make_matrix(self):
+    matrix_elements = []
+    pos_start = self.pos.copy()
+    
+    if self.current_char != '[':
+        return None, RTError(pos_start, self.pos, "Expected '[' to start matrix")
+
+    self.advance()
+    while self.current_char != ']':
+        if self.current_char == '[':
+            list_token = self.make_list()
+            if list_token.error: return None, list_token.error
+            matrix_elements.append(list_token.elements)
+        else:
+            self.advance()
+
+    self.advance()
+    return Token(Matrix, matrix_elements, pos_start, self.pos)
 
   def make_minus_or_arrow(self):
     tok_type = TT_MINUS

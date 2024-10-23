@@ -17,6 +17,7 @@ from ..Nodes.ContinueNode import ContinueNode
 from ..Nodes.BreakNode import BreakNode
 from ..Nodes.ListNode import ListNode
 from ..Nodes.SwitchNode import SwitchNode
+from ..Nodes.MatrixNode import MatrixNode
 
 class Parser:
     def __init__(self, tokens):
@@ -158,25 +159,41 @@ class Parser:
             res.register_advancement()
             self.advance()
 
-            if self.current_tok.type != TT_EQ:
-                return res.failure(
-                    InvalidSyntaxError(
-                        self.current_tok.pos_start,
-                        self.current_tok.pos_end,
-                        "Expected '='",
+            access_nodes = []
+            while self.current_tok.type == TT_LSQUARE:
+                res.register_advancement()
+                self.advance()
+
+                index_expr = res.register(self.expr())
+                if res.error:
+                    return res
+
+                if self.current_tok.type != TT_RSQUARE:
+                    return res.failure(
+                        InvalidSyntaxError(
+                            self.current_tok.pos_start,
+                            self.current_tok.pos_end,
+                            "Expected ']'",
+                        )
                     )
-                )
 
-            res.register_advancement()
-            self.advance()
-            expr = res.register(self.expr())
-            if res.error:
-                return res
-            return res.success(VarAssignNode(var_name, expr))
+                res.register_advancement()
+                self.advance()
+                access_nodes.append(index_expr)
 
-        node = res.register(
-            self.bin_op(self.comp_expr, ((TT_KEYWORD, "FREYR"), (TT_KEYWORD, "LOKI")))
-        )
+            if self.current_tok.type == TT_EQ:
+                res.register_advancement()
+                self.advance()
+
+                value = res.register(self.expr())
+                if res.error:
+                    return res
+
+                return res.success(VarAssignNode(var_name, value, access_nodes))
+
+            return res.success(VarAccessNode(var_name, access_nodes))
+
+        node = res.register(self.bin_op(self.comp_expr, ((TT_KEYWORD, "FREYR"), (TT_KEYWORD, "LOKI"))))
 
         if res.error:
             return res.failure(
@@ -188,6 +205,7 @@ class Parser:
             )
 
         return res.success(node)
+
 
     def comp_expr(self):
         res = ParseResult()
@@ -301,10 +319,12 @@ class Parser:
             self.advance()
             return res.success(StringNode(tok))
 
+
         elif tok.type == TT_IDENTIFIER:
-            res.register_advancement()
-            self.advance()
-            return res.success(VarAccessNode(tok))
+            var_access = res.register(self.var_access())
+            if res.error:
+                return res
+            return res.success(var_access)
 
         elif tok.type == TT_LPAREN:
             res.register_advancement()
@@ -355,6 +375,12 @@ class Parser:
                 return res
             return res.success(func_def)
 
+        elif tok.type == TT_LSQUARE and self.next_token_is_matrix():
+            matrix_expr = res.register(self.matrix_expr())
+            if res.error:
+                return res
+            return res.success(matrix_expr)
+        
         return res.failure(
             InvalidSyntaxError(
                 tok.pos_start,
@@ -362,6 +388,87 @@ class Parser:
                 "Expected int, float, identifier, '+', '-', '(', '[', ODIN', 'FLOKI', 'ASGARD', 'MAGIC'",
             )
         )
+
+
+    def var_access(self):
+        res = ParseResult()
+        var_name = self.current_tok
+
+        if self.current_tok.type != TT_IDENTIFIER:
+            return res.failure(
+                InvalidSyntaxError(
+                    self.current_tok.pos_start,
+                    self.current_tok.pos_end,
+                    "Expected identifier",
+                )
+            )
+
+        res.register_advancement()
+        self.advance()
+
+        # Manejar múltiples corchetes para acceso a índices
+        access_nodes = []
+        while self.current_tok.type == TT_LSQUARE:
+            res.register_advancement()
+            self.advance()
+
+            index_expr = res.register(self.expr())
+            if res.error:
+                return res
+
+            if self.current_tok.type != TT_RSQUARE:
+                return res.failure(
+                    InvalidSyntaxError(
+                        self.current_tok.pos_start,
+                        self.current_tok.pos_end,
+                        "Expected ']'",
+                    )
+                )
+
+            res.register_advancement()
+            self.advance()
+            access_nodes.append(index_expr)
+
+        return res.success(VarAccessNode(var_name, access_nodes))
+
+
+
+    def matrix_expr(self):
+        res = ParseResult()
+        element_nodes = []
+        pos_start = self.current_tok.pos_start.copy()
+
+        if self.current_tok.type != TT_LSQUARE:
+            return res.failure(
+                InvalidSyntaxError(self.current_tok.pos_start, self.current_tok.pos_end, f"Expected '['")
+            )
+
+        res.register_advancement()
+        self.advance()
+
+        if self.current_tok.type == TT_RSQUARE:
+            res.register_advancement()
+            self.advance()
+        else:
+            element_nodes.append(res.register(self.list_expr()))
+            if res.error:
+                return res
+
+            while self.current_tok.type == TT_COMMA:
+                res.register_advancement()
+                self.advance()
+                element_nodes.append(res.register(self.list_expr()))
+                if res.error:
+                    return res
+            if self.current_tok.type != TT_RSQUARE:
+                return res.failure(
+                    InvalidSyntaxError(self.current_tok.pos_start, self.current_tok.pos_end, f"Expected ',' or ']'")
+                )
+
+            res.register_advancement()
+            self.advance()
+
+        return res.success(MatrixNode(element_nodes, pos_start, self.current_tok.pos_end.copy()))
 
     def list_expr(self):
         res = ParseResult()

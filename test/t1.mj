@@ -1,17 +1,7 @@
-RUNE runa2 = 5
-SAGA(runa2)
+RUNE M = [[1, 2], [3, 4]]
+RUNE N = [[5, 6], [7, 8]]
 
-HEIMDALL runa2 YGGDRASIL
-    SURTR 1 YGGDRASIL
-        SAGA("Es 1")
-    SURTR 2 YGGDRASIL
-        SAGA("Es 2")
-    SURTR 3 YGGDRASIL
-        SAGA("Es 3")
-    RAGNAROK
-    SURTR 5 YGGDRASIL
-        SAGA("Es 5")
-    RAGNAROK
-    FENRIR
-        SAGA("Caso por defecto")
-    RAGNAROK
+RUNE SUM = M + N  # Suma de matrices
+RUNE MUL = M * 2  # Multiplicación por escalar
+SAGA(SUM)
+SAGA(MUL)

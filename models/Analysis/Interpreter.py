@@ -5,7 +5,7 @@ from ..Constants import *
 from ..Base.List import List
 from ..Base.Function import Function
 from ..Errors.RTError import RTError
-
+from ..Nodes.MatrixNode import MatrixNode
 class Interpreter:
   def visit(self, node, context):
     method_name = f'visit_{type(node).__name__}'
@@ -58,9 +58,77 @@ class Interpreter:
     res = RTResult()
     var_name = node.var_name_tok.value
     value = res.register(self.visit(node.value_node, context))
-    if res.should_return(): return res
+    if res.should_return():
+        return res
 
-    context.symbol_table.set(var_name, value)
+    if not node.access_nodes:
+        context.symbol_table.set(var_name, value)
+        return res.success(value)
+
+    var_value = context.symbol_table.get(var_name)
+    if not var_value:
+        return res.failure(RTError(
+            node.pos_start, node.pos_end,
+            f"'{var_name}' is not defined",
+            context
+        ))
+
+    if not isinstance(var_value, MatrixNode) and not isinstance(var_value, List):
+        return res.failure(RTError(
+            node.pos_start, node.pos_end,
+            "Value is not indexable",
+            context
+        ))
+
+    target = var_value.copy()
+    target.set_context(context).set_pos(node.pos_start, node.pos_end)
+
+    for index_node in node.access_nodes[:-1]:
+        index = res.register(self.visit(index_node, context))
+        if res.should_return():
+            return res
+
+        if not isinstance(index, Number):
+            return res.failure(RTError(
+                node.pos_start, node.pos_end,
+                "Index must be a number",
+                context
+            ))
+
+        index_value = int(index.value)
+        try:
+            target = target.elements[index_value]
+        except IndexError:
+            return res.failure(RTError(
+                node.pos_start, node.pos_end,
+                "Index out of bounds",
+                context
+            ))
+
+    last_index_node = node.access_nodes[-1]
+    last_index = res.register(self.visit(last_index_node, context))
+    if res.should_return():
+        return res
+
+    if not isinstance(last_index, Number):
+        return res.failure(RTError(
+            node.pos_start, node.pos_end,
+            "Index must be a number",
+            context
+        ))
+
+    last_index_value = int(last_index.value)
+    try:
+        target.elements[last_index_value] = value
+    except IndexError:
+        return res.failure(RTError(
+            node.pos_start, node.pos_end,
+            "Index out of bounds",
+            context
+        ))
+
+    context.symbol_table.set(var_name, var_value)
+
     return res.success(value)
 
   def visit_BinOpNode(self, node, context):
@@ -251,6 +319,60 @@ class Interpreter:
       context.symbol_table.set(func_name, func_value)
 
     return res.success(func_value)
+
+  def visit_MatrixNode(self, node, context):
+    res = RTResult()
+    elements = []
+
+    for row_node in node.elements:
+        row = res.register(self.visit(row_node, context))
+        if res.should_return(): return res
+        elements.append(row.elements)
+
+    return res.success(MatrixNode(elements).set_context(context).set_pos(node.pos_start, node.pos_end))
+
+  def visit_VarAccessNode(self, node, context):
+    res = RTResult()
+    var_name = node.var_name_tok.value
+    value = context.symbol_table.get(var_name)
+
+    if not value:
+        return res.failure(RTError(
+            node.pos_start, node.pos_end,
+            f"'{var_name}' is not defined",
+            context
+        ))
+
+    value = value.copy().set_pos(node.pos_start, node.pos_end).set_context(context)
+    for index_node in node.access_nodes:
+        index = res.register(self.visit(index_node, context))
+        if res.should_return():
+            return res
+
+        if not isinstance(index, Number):
+            return res.failure(RTError(
+                node.pos_start, node.pos_end,
+                "Index must be a number",
+                context
+            ))
+
+        if isinstance(value, List) or isinstance(value, MatrixNode):
+            try:
+                value = value.elements[int(index.value)]
+            except IndexError:
+                return res.failure(RTError(
+                    node.pos_start, node.pos_end,
+                    "Index out of bounds",
+                    context
+                ))
+        else:
+            return res.failure(RTError(
+                node.pos_start, node.pos_end,
+                "Value is not indexable",
+                context
+            ))
+
+    return res.success(value)
 
   def visit_CallNode(self, node, context):
     res = RTResult()
