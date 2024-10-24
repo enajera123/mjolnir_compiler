@@ -1051,7 +1051,7 @@ class Parser:
     ###################################
 
     def bin_op(self, func_a, ops, func_b=None):
-        if func_b == None:
+        if func_b is None:
             func_b = func_a
 
         res = ParseResult()
@@ -1059,10 +1059,7 @@ class Parser:
         if res.error:
             return res
 
-        while (
-            self.current_tok.type in ops
-            or (self.current_tok.type, self.current_tok.value) in ops
-        ):
+        while self.current_tok.type in ops or (self.current_tok.type, self.current_tok.value) in ops:
             op_tok = self.current_tok
             res.register_advancement()
             self.advance()

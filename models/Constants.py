@@ -46,7 +46,7 @@ KEYWORDS = [
     "ODIN",  # IF
     "FRIGG",  # ELIF
     "FENRIR",  # ELSE
-    "VALHALLA",  # FOR
+    "FLOKI",  # FOR
     "BIFROST",  # TO
     "MJOLNIR",  # STEP
     "ASGARD",  # WHILE
