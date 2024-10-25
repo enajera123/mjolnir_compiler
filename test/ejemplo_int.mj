@@ -1,0 +1,2 @@
+RUNE string = "Jose y Esteban" 
+SAGA("El proyecto fue hecho por:" + string)

@@ -1,4 +1,4 @@
-MAGIC sumar(a, b) -> YGGDRASIL
+MAGIC sumar(a, b)
     VALKYRIE a + b
 RAGNAROK
 

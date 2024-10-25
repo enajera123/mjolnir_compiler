@@ -71,7 +71,25 @@ class main_view(QMainWindow):
         self.actionGuardar.triggered.connect(self.save_file)
         self.actionGuardar_como.triggered.connect(self.save_file_as)
         self.actionNuevo.triggered.connect(self.new_file)
-
+        self.actionSwitch.triggered.connect(lambda: self.insert_reserved_word("HEIMDALL"))
+        self.actionSurtr.triggered.connect(lambda: self.insert_reserved_word("SURTR"))
+        self.actionRune.triggered.connect(lambda: self.insert_reserved_word("RUNE"))
+        self.actionFreyr.triggered.connect(lambda: self.insert_reserved_word("FREYR"))
+        self.actionLoki.triggered.connect(lambda: self.insert_reserved_word("LOKI"))
+        self.actionHel.triggered.connect(lambda: self.insert_reserved_word("HEL"))
+        self.actionOdin.triggered.connect(lambda: self.insert_reserved_word("ODIN"))
+        self.actionFrigg.triggered.connect(lambda: self.insert_reserved_word("FRIGG"))
+        self.actionFenrir.triggered.connect(lambda: self.insert_reserved_word("FENRIR"))
+        self.actionFloki.triggered.connect(lambda: self.insert_reserved_word("FLOKI"))
+        self.actionBifrost.triggered.connect(lambda: self.insert_reserved_word("BIFROST"))
+        self.actionMjolnir.triggered.connect(lambda: self.insert_reserved_word("MJOLNIR"))
+        self.actionAsgard.triggered.connect(lambda: self.insert_reserved_word("ASGARD"))
+        self.actionMagic.triggered.connect(lambda: self.insert_reserved_word("MAGIC"))
+        self.actionYggdrasil.triggered.connect(lambda: self.insert_reserved_word("YGGDRASIL"))
+        self.actionRagnarok.triggered.connect(lambda: self.insert_reserved_word("RAGNAROK"))
+        self.actionValkyrie.triggered.connect(lambda: self.insert_reserved_word("VALKYRIE"))
+        self.actionSleipnir.triggered.connect(lambda: self.insert_reserved_word("SLEIPNIR"))
+        self.actionJormungand.triggered.connect(lambda: self.insert_reserved_word("JORMUNGAND"))
         self.actionOperaciones_aritm_ticas.triggered.connect(
             lambda: self.load_example("../test/ejemplo_operaciones_aritmeticas.mj"))
         self.actionRetorno_en_funciones.triggered.connect(
@@ -90,6 +108,7 @@ class main_view(QMainWindow):
         self.actionSwitch_2.triggered.connect(lambda: self.load_example("../test/ejemplo_switch.mj"))
         self.actionRune_2.triggered.connect(lambda: self.load_example("../test/ejemplo_rune.mj"))
         self.actionListas.triggered.connect(lambda: self.load_example("../test/ejemplo_listas.mj"))
+        self.actionValores_de_entrada.triggered.connect(lambda: self.load_example("../test/ejemplo_entrada.mj"))
         self.actionGuardar.setEnabled(False)
 
     def load_example(self, filename):
@@ -108,6 +127,11 @@ class main_view(QMainWindow):
         self.current_file_path = None
         self.actionGuardar.setEnabled(False)
         QMessageBox.information(self, "Nuevo archivo", "Se ha creado un nuevo archivo.")
+
+    def insert_reserved_word(self, word):
+        cursor = self.txt_input.textCursor()
+        cursor.insertText(word + " ")
+        self.txt_input.setTextCursor(cursor)
 
     def save_file(self):
         if self.current_file_path:
