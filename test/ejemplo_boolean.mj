@@ -1,0 +1,4 @@
+RUNE verdadero = THOR_TRUE
+SAGA(verdadero)
+RUNE falso = LOKI_FALSE
+SAGA(falso)

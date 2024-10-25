@@ -109,6 +109,7 @@ class main_view(QMainWindow):
         self.actionRune_2.triggered.connect(lambda: self.load_example("../test/ejemplo_rune.mj"))
         self.actionListas.triggered.connect(lambda: self.load_example("../test/ejemplo_listas.mj"))
         self.actionValores_de_entrada.triggered.connect(lambda: self.load_example("../test/ejemplo_entrada.mj"))
+        self.actionBoolean.triggered.connect(lambda: self.load_example("../test/ejemplo_boolean.mj"))
         self.actionGuardar.setEnabled(False)
 
     def load_example(self, filename):

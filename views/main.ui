@@ -544,6 +544,7 @@ QMenuBar::item:selected {
      <addaction name="actionString"/>
      <addaction name="actionFloat"/>
      <addaction name="actionMatriz_2"/>
+     <addaction name="actionBoolean"/>
     </widget>
     <addaction name="menuSintaxis"/>
     <addaction name="menuSintaxis_2"/>
@@ -771,6 +772,11 @@ QMenuBar::item:selected {
   <action name="actionValores_de_entrada">
    <property name="text">
     <string>Valores de entrada</string>
+   </property>
+  </action>
+  <action name="actionBoolean">
+   <property name="text">
+    <string>Boolean</string>
    </property>
   </action>
  </widget>

@@ -1,2 +1,2 @@
-RUNE float = 2.0
+RUNE float = 2.0 + 2.5
 SAGA(float)
