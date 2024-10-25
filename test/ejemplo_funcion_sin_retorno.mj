@@ -1,5 +1,3 @@
-MAGIC imprimir_mensaje(mensaje) -> YGGDRASIL
-    SAGA(mensaje)
-RAGNAROK
+MAGIC imprimir_mensaje(mensaje) -> SAGA(mensaje)
 
 imprimir_mensaje("Hola desde Mjolnir")
