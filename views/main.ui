@@ -78,78 +78,6 @@ QPushButton:hover{
          </property>
         </widget>
        </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
-         <item>
-          <widget class="QPushButton" name="btn_save">
-           <property name="enabled">
-            <bool>true</bool>
-           </property>
-           <property name="font">
-            <font>
-             <italic>false</italic>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>Guardar</string>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>30</width>
-             <height>30</height>
-            </size>
-           </property>
-           <property name="autoRepeatDelay">
-            <number>300</number>
-           </property>
-           <property name="autoDefault">
-            <bool>false</bool>
-           </property>
-           <property name="default">
-            <bool>false</bool>
-           </property>
-           <property name="flat">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="btn_open">
-           <property name="enabled">
-            <bool>true</bool>
-           </property>
-           <property name="font">
-            <font>
-             <italic>false</italic>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>Cargar</string>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>30</width>
-             <height>30</height>
-            </size>
-           </property>
-           <property name="autoRepeatDelay">
-            <number>300</number>
-           </property>
-           <property name="autoDefault">
-            <bool>false</bool>
-           </property>
-           <property name="default">
-            <bool>false</bool>
-           </property>
-           <property name="flat">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
       </layout>
      </widget>
     </item>
@@ -321,6 +249,324 @@ QPushButton:hover{
     </item>
    </layout>
   </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QMenuBar {
+   background-color: #141414;
+   color: white;
+}
+QMenuBar::item {
+   background-color: #141414;
+   color: white;
+}
+QMenuBar::item:selected {
+   background-color: #1e1e1e;
+}
+</string>
+   </property>
+   <widget class="QMenu" name="menuArchivo">
+    <property name="title">
+     <string>Archivo</string>
+    </property>
+    <addaction name="actionNuevo"/>
+    <addaction name="actionAbrir"/>
+    <addaction name="actionGuardar"/>
+    <addaction name="actionGuardar_como"/>
+   </widget>
+   <widget class="QMenu" name="menuCodigos">
+    <property name="title">
+     <string>Opciones</string>
+    </property>
+    <widget class="QMenu" name="menuSintaxis">
+     <property name="title">
+      <string>Palabras reservadas</string>
+     </property>
+     <addaction name="actionSwitch"/>
+     <addaction name="actionSurtr"/>
+     <addaction name="actionRune"/>
+     <addaction name="actionFreyr"/>
+     <addaction name="actionLoki"/>
+     <addaction name="actionHel"/>
+     <addaction name="actionOdin"/>
+     <addaction name="actionFrigg"/>
+     <addaction name="actionFenrir"/>
+     <addaction name="actionFloki"/>
+     <addaction name="actionBifrost"/>
+     <addaction name="actionMjolnir"/>
+     <addaction name="actionAsgard"/>
+     <addaction name="actionMagic"/>
+     <addaction name="actionYggdrasil"/>
+     <addaction name="actionRagnarok"/>
+     <addaction name="actionValkyrie"/>
+     <addaction name="actionSleipnir"/>
+     <addaction name="actionJormungand"/>
+    </widget>
+    <widget class="QMenu" name="menuSintaxis_2">
+     <property name="title">
+      <string>Sintaxis</string>
+     </property>
+     <widget class="QMenu" name="menuFunciones">
+      <property name="title">
+       <string>Funciones</string>
+      </property>
+      <addaction name="actionRetorno_en_funciones"/>
+      <addaction name="actionFunci_n_con_m_ltiples_argumentos"/>
+      <addaction name="actionFunciones_sin_retorno"/>
+     </widget>
+     <addaction name="actionFor"/>
+     <addaction name="actionWhile"/>
+     <addaction name="actionIf"/>
+     <addaction name="actionSwitch_2"/>
+     <addaction name="actionOperaciones_aritm_ticas"/>
+     <addaction name="menuFunciones"/>
+    </widget>
+    <widget class="QMenu" name="menuSemantica">
+     <property name="title">
+      <string>Semantica</string>
+     </property>
+     <addaction name="actionRune_2"/>
+     <addaction name="actionListas"/>
+    </widget>
+    <widget class="QMenu" name="menuTipos_de_datos">
+     <property name="title">
+      <string>Tipos de datos</string>
+     </property>
+     <addaction name="actionInt"/>
+     <addaction name="actionString"/>
+     <addaction name="actionFloat"/>
+     <addaction name="actionMatriz_2"/>
+    </widget>
+    <addaction name="menuSintaxis"/>
+    <addaction name="menuSintaxis_2"/>
+    <addaction name="menuSemantica"/>
+    <addaction name="menuTipos_de_datos"/>
+   </widget>
+   <addaction name="menuArchivo"/>
+   <addaction name="menuCodigos"/>
+  </widget>
+  <action name="actionSwitch">
+   <property name="text">
+    <string>HEIMDALL (Switch)</string>
+   </property>
+  </action>
+  <action name="actionSurtr">
+   <property name="text">
+    <string>SURTR (Case)</string>
+   </property>
+  </action>
+  <action name="actionRune">
+   <property name="text">
+    <string>RUNE (Var)</string>
+   </property>
+  </action>
+  <action name="actionFreyr">
+   <property name="text">
+    <string>FREYR (And)</string>
+   </property>
+  </action>
+  <action name="actionLoki">
+   <property name="text">
+    <string>LOKI (Or)</string>
+   </property>
+  </action>
+  <action name="actionHel">
+   <property name="text">
+    <string>HEL (Not)</string>
+   </property>
+  </action>
+  <action name="actionOdin">
+   <property name="text">
+    <string>ODIN (If)</string>
+   </property>
+  </action>
+  <action name="actionFrigg">
+   <property name="text">
+    <string>FRIGG (Elif)</string>
+   </property>
+  </action>
+  <action name="actionFenrir">
+   <property name="text">
+    <string>FENRIR (Else)</string>
+   </property>
+  </action>
+  <action name="actionFloki">
+   <property name="text">
+    <string>FLOKI (For)</string>
+   </property>
+  </action>
+  <action name="actionBifrost">
+   <property name="text">
+    <string>BIFROST (To)</string>
+   </property>
+  </action>
+  <action name="actionMjolnir">
+   <property name="text">
+    <string>MJOLNIR (Step)</string>
+   </property>
+  </action>
+  <action name="actionAsgard">
+   <property name="text">
+    <string>ASGARD (While)</string>
+   </property>
+  </action>
+  <action name="actionMagic">
+   <property name="text">
+    <string>MAGIC (Fun)</string>
+   </property>
+  </action>
+  <action name="actionYggdrasil">
+   <property name="text">
+    <string>YGGDRASIL (Then)</string>
+   </property>
+  </action>
+  <action name="actionRagnarok">
+   <property name="text">
+    <string>RAGNAROK (End)</string>
+   </property>
+  </action>
+  <action name="actionValkyrie">
+   <property name="text">
+    <string>VALKYRIE (Return)</string>
+   </property>
+  </action>
+  <action name="actionSleipnir">
+   <property name="text">
+    <string>SLEIPNIR (Continue)</string>
+   </property>
+  </action>
+  <action name="actionJormungand">
+   <property name="text">
+    <string>JORMUNGAND (Break)</string>
+   </property>
+  </action>
+  <action name="actionNuevo">
+   <property name="text">
+    <string>Nuevo</string>
+   </property>
+  </action>
+  <action name="actionAbrir">
+   <property name="text">
+    <string>Abrir</string>
+   </property>
+  </action>
+  <action name="actionGuardar">
+   <property name="text">
+    <string>Guardar</string>
+   </property>
+  </action>
+  <action name="actionGuardar_como">
+   <property name="text">
+    <string>Guardar como</string>
+   </property>
+  </action>
+  <action name="actionFor">
+   <property name="text">
+    <string>For</string>
+   </property>
+  </action>
+  <action name="actionWhile">
+   <property name="text">
+    <string>While</string>
+   </property>
+  </action>
+  <action name="actionIf">
+   <property name="text">
+    <string>If</string>
+   </property>
+  </action>
+  <action name="actionSwitch_2">
+   <property name="text">
+    <string>Switch</string>
+   </property>
+  </action>
+  <action name="actionMagic_2">
+   <property name="text">
+    <string>Magic</string>
+   </property>
+  </action>
+  <action name="actionValkrie">
+   <property name="text">
+    <string>Valkyrie</string>
+   </property>
+  </action>
+  <action name="actionOperaciones_aritm_ticas">
+   <property name="text">
+    <string>Operaciones aritméticas</string>
+   </property>
+  </action>
+  <action name="actionRetorno_en_funciones">
+   <property name="text">
+    <string>Retorno en funciones</string>
+   </property>
+  </action>
+  <action name="actionFunci_n_con_m_ltiples_argumentos">
+   <property name="text">
+    <string>Función con múltiples argumentos</string>
+   </property>
+  </action>
+  <action name="actionFunciones_sin_retorno">
+   <property name="text">
+    <string>Funciones sin retorno</string>
+   </property>
+  </action>
+  <action name="actionAnd">
+   <property name="text">
+    <string>And</string>
+   </property>
+  </action>
+  <action name="actionOr">
+   <property name="text">
+    <string>Or</string>
+   </property>
+  </action>
+  <action name="actionNot">
+   <property name="text">
+    <string>Not</string>
+   </property>
+  </action>
+  <action name="actionRune_2">
+   <property name="text">
+    <string>Rune</string>
+   </property>
+  </action>
+  <action name="actionListas">
+   <property name="text">
+    <string>Listas</string>
+   </property>
+  </action>
+  <action name="actionMatriz">
+   <property name="text">
+    <string>Matriz</string>
+   </property>
+  </action>
+  <action name="actionInt">
+   <property name="text">
+    <string>Int</string>
+   </property>
+  </action>
+  <action name="actionString">
+   <property name="text">
+    <string>String</string>
+   </property>
+  </action>
+  <action name="actionFloat">
+   <property name="text">
+    <string>Float</string>
+   </property>
+  </action>
+  <action name="actionMatriz_2">
+   <property name="text">
+    <string>Matriz</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

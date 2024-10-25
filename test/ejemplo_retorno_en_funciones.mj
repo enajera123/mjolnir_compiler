@@ -1,0 +1,7 @@
+MAGIC calcular_area(radio) -> YGGDRASIL
+    RUNE area = MIDGARD_PI * radio * radio
+    VALKYRIE area
+RAGNAROK
+
+RUNE resultado = calcular_area(5)
+SAGA(resultado)

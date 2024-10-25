@@ -1,0 +1,3 @@
+RUNE x = 10
+RUNE y = 20
+SAGA(x + y)

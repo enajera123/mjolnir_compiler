@@ -6,6 +6,11 @@ RUNE resta = runa1 - runa2
 RUNE multiplicacion = runa1 * runa2
 RUNE division = runa1 / runa2
 
+RUNE base = 5 
+RUNE exponente = 2 
+RUNE resultado = base ^ exponente
+SAGA(resultado)
+
 SAGA(suma)
 SAGA(resta)
 SAGA(multiplicacion)

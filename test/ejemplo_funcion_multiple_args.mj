@@ -1,0 +1,6 @@
+MAGIC sumar(a, b) -> YGGDRASIL
+    VALKYRIE a + b
+RAGNAROK
+
+RUNE resultado = sumar(4, 6)
+SAGA(resultado)
