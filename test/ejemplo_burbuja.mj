@@ -1,0 +1,18 @@
+RUNE lista = [5, 3, 8, 4, 2]
+RUNE i=0
+RUNE j=0
+RUNE x = 5
+
+FLOKI i = 0 BIFROST 5 MJOLNIR 1 YGGDRASIL
+    FLOKI j = 0 BIFROST 4 MJOLNIR 1  YGGDRASIL
+        ODIN(lista[j] > lista[j + 1])YGGDRASIL
+            RUNE temp = lista[j]
+            RUNE lista[j] = lista[j + 1]
+            RUNE lista[j + 1] = temp
+        FENRIR 
+            SLEIPNIR
+        RAGNAROK
+    RAGNAROK
+RAGNAROK
+
+SAGA(lista)

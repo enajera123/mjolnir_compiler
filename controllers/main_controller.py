@@ -110,16 +110,17 @@ class main_view(QMainWindow):
         self.actionListas.triggered.connect(lambda: self.load_example("../test/ejemplo_listas.mj"))
         self.actionValores_de_entrada.triggered.connect(lambda: self.load_example("../test/ejemplo_entrada.mj"))
         self.actionBoolean.triggered.connect(lambda: self.load_example("../test/ejemplo_boolean.mj"))
+        self.actionOperaciones_de_matrices.triggered.connect(lambda: self.load_example("../test/ejemplo_sum.mj"))
+        self.actionOrdenamiento_por_burbuja.triggered.connect(lambda: self.load_example("../test/ejemplo_burbuja.mj"))
+        self.actionBusqueda_en_una_matriz.triggered.connect(lambda: self.load_example("../test/ejemplo_busqueda.mj"))
         self.actionGuardar.setEnabled(False)
 
     def load_example(self, filename):
-        """Carga el ejemplo de un archivo de texto y lo inserta en el campo de texto."""
         try:
             filepath = os.path.join("examples", filename)
             with open(filepath, 'r', encoding='utf-8') as file:
                 content = file.read()
             self.txt_input.setPlainText(content)
-            QMessageBox.information(self, "Ejemplo cargado", f"Ejemplo de '{filename}' cargado exitosamente.")
         except Exception as e:
             QMessageBox.critical(self, "Error", f"No se pudo cargar el ejemplo: {e}")
 
@@ -127,7 +128,6 @@ class main_view(QMainWindow):
         self.txt_input.clear()
         self.current_file_path = None
         self.actionGuardar.setEnabled(False)
-        QMessageBox.information(self, "Nuevo archivo", "Se ha creado un nuevo archivo.")
 
     def insert_reserved_word(self, word):
         cursor = self.txt_input.textCursor()
@@ -139,7 +139,6 @@ class main_view(QMainWindow):
             try:
                 with open(self.current_file_path, 'w') as file:
                     file.write(self.txt_input.toPlainText())
-                QMessageBox.information(self, "Éxito", "Archivo guardado exitosamente.")
             except Exception as e:
                 QMessageBox.critical(self, "Error", f"No se pudo guardar el archivo: {e}")
         else:

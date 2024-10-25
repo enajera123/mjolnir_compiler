@@ -1,0 +1,27 @@
+RUNE M = [[10, 20, 30], [40, 50, 60], [70, 80, 90]]
+RUNE encontrado = 0
+
+SAGA("Ingresa el numero a buscar:")
+RUNE objetivo = RAGNAR_INT()
+
+FLOKI i = 0 BIFROST 3 MJOLNIR 1 YGGDRASIL
+    FLOKI j = 0 BIFROST 3 MJOLNIR 1 YGGDRASIL
+        ODIN(M[i][j] == objetivo)YGGDRASIL
+            RUNE encontrado = 1
+            JORMUNGAND
+        FENRIR
+            SLEIPNIR
+        RAGNAROK
+    ODIN(encontrado == 1)YGGDRASIL
+        JORMUNGAND
+    FENRIR
+        SLEIPNIR
+    RAGNAROK
+    RAGNAROK
+RAGNAROK
+
+ODIN(encontrado == 1) YGGDRASIL
+    SAGA("N�mero encontrado")
+FENRIR
+    SAGA("N�mero no encontrado en la matriz")
+RAGNAROK

@@ -546,10 +546,19 @@ QMenuBar::item:selected {
      <addaction name="actionMatriz_2"/>
      <addaction name="actionBoolean"/>
     </widget>
+    <widget class="QMenu" name="menuEjemplos_de_Codigo">
+     <property name="title">
+      <string>Ejemplos de Codigo</string>
+     </property>
+     <addaction name="actionOperaciones_de_matrices"/>
+     <addaction name="actionOrdenamiento_por_burbuja"/>
+     <addaction name="actionBusqueda_en_una_matriz"/>
+    </widget>
     <addaction name="menuSintaxis"/>
     <addaction name="menuSintaxis_2"/>
     <addaction name="menuSemantica"/>
     <addaction name="menuTipos_de_datos"/>
+    <addaction name="menuEjemplos_de_Codigo"/>
    </widget>
    <addaction name="menuArchivo"/>
    <addaction name="menuCodigos"/>
@@ -777,6 +786,21 @@ QMenuBar::item:selected {
   <action name="actionBoolean">
    <property name="text">
     <string>Boolean</string>
+   </property>
+  </action>
+  <action name="actionOperaciones_de_matrices">
+   <property name="text">
+    <string>Operaciones de matrices</string>
+   </property>
+  </action>
+  <action name="actionOrdenamiento_por_burbuja">
+   <property name="text">
+    <string>Ordenamiento por burbuja</string>
+   </property>
+  </action>
+  <action name="actionBusqueda_en_una_matriz">
+   <property name="text">
+    <string>Busqueda en una matriz</string>
    </property>
   </action>
  </widget>
