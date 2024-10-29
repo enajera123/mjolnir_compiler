@@ -6,6 +6,10 @@ from ..Base.List import List
 from ..Base.Function import Function
 from ..Errors.RTError import RTError
 from ..Nodes.MatrixNode import MatrixNode
+from ..Errors.ExpectedCharError import ExpectedCharError
+from ..Errors.IllegalCharError import IllegalCharError
+from ..Errors.InvalidSyntaxError import InvalidSyntaxError
+from ..Errors.Error import Error
 class Interpreter:
   def visit(self, node, context):
     method_name = f'visit_{type(node).__name__}'
@@ -137,7 +141,7 @@ class Interpreter:
     if res.should_return(): return res
     right = res.register(self.visit(node.right_node, context))
     if res.should_return(): return res
-
+    
     if node.op_tok.type == TT_PLUS:
       result, error = left.added_to(right)
     elif node.op_tok.type == TT_MINUS:
@@ -160,9 +164,9 @@ class Interpreter:
       result, error = left.get_comparison_lte(right)
     elif node.op_tok.type == TT_GTE:
       result, error = left.get_comparison_gte(right)
-    elif node.op_tok.matches(TT_KEYWORD, 'AND'):
+    elif node.op_tok.matches(TT_KEYWORD, 'FREYR'):
       result, error = left.anded_by(right)
-    elif node.op_tok.matches(TT_KEYWORD, 'OR'):
+    elif node.op_tok.matches(TT_KEYWORD, 'LOKI'):
       result, error = left.ored_by(right)
 
     if error:
@@ -179,7 +183,7 @@ class Interpreter:
 
     if node.op_tok.type == TT_MINUS:
       number, error = number.multed_by(Number(-1))
-    elif node.op_tok.matches(TT_KEYWORD, 'NOT'):
+    elif node.op_tok.matches(TT_KEYWORD, 'HEL'):
       number, error = number.notted()
 
     if error:
